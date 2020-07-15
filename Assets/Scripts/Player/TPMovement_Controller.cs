@@ -30,8 +30,6 @@ public class TPMovement_Controller : MonoBehaviour
     public GameObject arrowToShootPrefab, arrowSpawnPoint, arrowFirePrefab;
     public UnityEngine.UI.Slider rageBar;
     public Animator rageBarAnim;
-    public GameObject rewardPanel;
-    private UnityEngine.UI.Text rewardPanelText;
     [Header("Cursor options")]
     public Texture2D cursorTexture;
     public CursorMode cursorMode = CursorMode.Auto;
@@ -76,7 +74,6 @@ public class TPMovement_Controller : MonoBehaviour
     public float attack3Radius = 2f;
     private float internalAttack1Cooldown, internalAttack2Cooldown, internalAttack3Cooldown;
     private float internalAttack1Timestamp, internalAttack2Timestamp, internalAttack3Timestamp;
-    public bool bowUnlocked = false;
     public float maxSwitchEquipmentDuration;
     private float elapsedSwitchedEquipmentDuration;
 
@@ -128,7 +125,6 @@ public class TPMovement_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
-        rewardPanelText = rewardPanel.GetComponentInChildren<UnityEngine.UI.Text>();
 
         Cursor.SetCursor(cursorTexture, cursorHotSpot, cursorMode);
         Cursor.lockState = CursorLockMode.Locked;
@@ -548,21 +544,6 @@ public class TPMovement_Controller : MonoBehaviour
         is_Grounded = true;
     }
 
-    public void UnlockBow()
-    {
-        bowUnlocked = true;
-        rewardPanel.SetActive(true);
-        rewardPanelText.text = "Bow unlocked!";
-        StartCoroutine(DisableGameObjectAfter(rewardPanel, 3f));
-        Debug.Log("Reward acquired: bow");
-    }
-
-    private IEnumerator DisableGameObjectAfter(GameObject objectToDisable, float disableAfterSeconds)
-    {
-        yield return new WaitForSeconds(disableAfterSeconds);
-        objectToDisable.SetActive(false);
-    }
-
     public void Attack1()
     {
         // Does the ray intersect any objects in the specified layer
@@ -905,12 +886,9 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleEquipmentSwitch(InputAction.CallbackContext context)
     {
-        if(bowUnlocked)
-        {
-            elapsedSwitchedEquipmentDuration = 0f;
-            movementState = MovementState.SwitchingEquipment;
-            anim.SetBool("is_EquipmentSwitch", true);
-        }    
+        elapsedSwitchedEquipmentDuration = 0f;
+        movementState = MovementState.SwitchingEquipment;      
+        anim.SetBool("is_EquipmentSwitch", true);
     }
     #endregion
 }
