@@ -19,8 +19,10 @@ public class QuestComponent : MonoBehaviour
             new Quest("EnemyDouble", 3, "Slay 3 double sworded enemies"),
             new Quest("EnemyBow", 2, "Slay 2 bowmen")
         };
-    }
 
+        quests[1].ShouldUnlockBow = true;
+    }
+   
     public void AcceptQuest(int questID)
     {
         quests[questID].AcceptQuest();
@@ -43,6 +45,10 @@ public class QuestComponent : MonoBehaviour
                 if (tempQuest.GetCurrentQuestCompleteStatus())
                 {
                     text_Quests[currQuest].gameObject.SetActive(false);
+                    if(tempQuest.ShouldUnlockBow)
+                    {
+                        GetComponent<TPMovement_Controller>().UnlockBow();
+                    }
                 }
             }
             currQuest++;
@@ -75,6 +81,10 @@ public class QuestComponent : MonoBehaviour
         private bool questAccepted = false;
         private bool questComplete = false;
 
+
+        //Quest rewards
+        public bool ShouldUnlockBow { get; set; }
+
         #region Methods
         public void AcceptQuest()
         {
@@ -92,7 +102,7 @@ public class QuestComponent : MonoBehaviour
             {
                 questComplete = true;
             }
-            Debug.Log("Quest complete: " + questComplete);
+          //  Debug.Log("Quest complete: " + questComplete);
             return questComplete;
         }
         #endregion
