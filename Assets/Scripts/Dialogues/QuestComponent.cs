@@ -7,17 +7,18 @@ using UnityEngine.UI;
 /// </summary>
 public class QuestComponent : MonoBehaviour
 {
-    public GameObject questPanel;
+    private TPMovement_Controller playerController;
     public Text[] text_Quests;
 
     private List<Quest> quests;
 
     private void Start()
     {
+        playerController = GetComponent<TPMovement_Controller>();
         quests = new List<Quest>
         {
-            new Quest("EnemyDouble", 3, "Slay 3 double sworded enemies"),
-            new Quest("EnemyBow", 2, "Slay 2 bowmen")
+            new Quest("EnemyDouble", 3, "Slay 3 enemy swordsmen. Lazo asks you to help him get rid of his molesters, will you help?"),
+            new Quest("EnemyBow", 2, "Slay 2 enemy bowmen. Khasto can no longer watch his adorable puppies suffer everytime the bowmen practise their aim. ")
         };
 
         quests[1].ShouldUnlockBow = true;
@@ -26,7 +27,7 @@ public class QuestComponent : MonoBehaviour
     public void AcceptQuest(int questID)
     {
         quests[questID].AcceptQuest();
-        questPanel.SetActive(true);
+        playerController.SetQuestPanelState(true);
         text_Quests[questID].gameObject.SetActive(true);
         text_Quests[questID].text = quests[questID].questDescription;
         Debug.Log("ACCEPT QUEST CALLED");
@@ -53,8 +54,6 @@ public class QuestComponent : MonoBehaviour
             }
             currQuest++;
         }
-
-
     }
 
 

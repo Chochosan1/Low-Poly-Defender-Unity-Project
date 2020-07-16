@@ -191,6 +191,11 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
             currentPatrolPoint = Vector3.zero;
             currentTarget = null;
             currentTargetAI = null;
+
+            if(currentHealth <= 0)
+            {
+                Die();
+            }
         }
         else if (aiState == AIState.Dead)
         {
@@ -282,11 +287,35 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
                 {
                     attacker.GetComponent<QuestComponent>().CheckQuestProgressKill(this);
                 }
-                Instantiate(deathParticle, transform.position, Quaternion.identity);
-                GetComponent<CapsuleCollider>().enabled = false;
-                aiState = AIState.Dead;
+
+                Die();           
             }
         }
+    }
+
+    private void Die()
+    {
+        Instantiate(deathParticle, transform.position, Quaternion.identity);
+        GetComponent<CapsuleCollider>().enabled = false;
+        aiState = AIState.Dead;
+
+        //force the state by cancelling everything beforehand
+        anim.SetBool("is_WalkBackward", false);
+        anim.SetBool("is_WalkForward", false);
+        anim.SetBool("is_Idle", false);
+        anim.SetBool("is_WalkLeft", false);
+        anim.SetBool("is_WalkRight", false);
+        anim.SetBool("is_SprintForward", false);
+        anim.SetBool("is_SprintBackward", false);
+        anim.SetBool("is_RollForward", false);
+        anim.SetBool("is_Attack1", false);
+        anim.SetBool("is_Attack2", false);
+        anim.SetBool("is_Dead", true);
+        currentPatrolPoint = Vector3.zero;
+        is_Dead = true;
+        currentTarget = null;
+        currentTargetAI = null;
+        agent.SetDestination(transform.position);
     }
 
     public void Attack1()

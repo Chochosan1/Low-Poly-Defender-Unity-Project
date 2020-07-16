@@ -30,8 +30,11 @@ public class TPMovement_Controller : MonoBehaviour
     public GameObject arrowToShootPrefab, arrowSpawnPoint, arrowFirePrefab;
     public UnityEngine.UI.Slider rageBar;
     public Animator rageBarAnim;
-    public GameObject rewardPanel;
-    private UnityEngine.UI.Text rewardPanelText;
+    public GameObject alertPanel;
+    private UnityEngine.UI.Text alertPanelText;
+    public GameObject questPanel;
+    public GameObject interactableAlertText;
+    public GameObject hitObjectParticle;
     [Header("Cursor options")]
     public Texture2D cursorTexture;
     public CursorMode cursorMode = CursorMode.Auto;
@@ -90,6 +93,8 @@ public class TPMovement_Controller : MonoBehaviour
     [Header("Misc")]
     public float interactionRange;
     public LayerMask interactionLayer;
+    public float checkForInteractableAlertEveryXSeconds = 2f;
+    private float interactableCheckedTimestamp;
 
     private float currentMoveSpeed;
     private bool is_Grounded, is_Sprinting;
@@ -128,7 +133,7 @@ public class TPMovement_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
-        rewardPanelText = rewardPanel.GetComponentInChildren<UnityEngine.UI.Text>();
+        alertPanelText = alertPanel.GetComponentInChildren<UnityEngine.UI.Text>();
 
         Cursor.SetCursor(cursorTexture, cursorHotSpot, cursorMode);
         Cursor.lockState = CursorLockMode.Locked;
@@ -161,6 +166,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.MouseDelta.canceled += HandleMouseDelta;
         controls.MainControls.EquipmentSwitch.performed += HandleEquipmentSwitch;
         controls.MainControls.Interact.performed += HandleInteract;
+        controls.MainControls.ToggleQuestPanel.performed += HandleToggleQuestPanel;
         controls.MainControls.Movement.Enable();
         controls.MainControls.SprintToggle.Enable();
         controls.MainControls.LockedOrbit.Enable();
@@ -174,6 +180,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.MouseDelta.Enable();
         controls.MainControls.EquipmentSwitch.Enable();
         controls.MainControls.Interact.Enable();
+        controls.MainControls.ToggleQuestPanel.Enable();
     }
 
     private void OnDisable()
@@ -195,6 +202,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.MouseDelta.canceled -= HandleMouseDelta;
         controls.MainControls.EquipmentSwitch.performed -= HandleEquipmentSwitch;
         controls.MainControls.Interact.performed -= HandleInteract;
+        controls.MainControls.ToggleQuestPanel.performed -= HandleToggleQuestPanel;
         controls.MainControls.Movement.Disable();
         controls.MainControls.SprintToggle.Disable();
         controls.MainControls.LockedOrbit.Disable();
@@ -208,6 +216,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.MouseDelta.Disable();
         controls.MainControls.EquipmentSwitch.Disable();
         controls.MainControls.Interact.Disable();
+        controls.MainControls.ToggleQuestPanel.Disable();
     }
     #endregion
 
@@ -408,6 +417,7 @@ public class TPMovement_Controller : MonoBehaviour
             }
         }
 
+        CheckForInteractables();
        
         if (moveAxis != Vector2.zero && movementState != MovementState.Roll && movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment)
         {
@@ -551,9 +561,9 @@ public class TPMovement_Controller : MonoBehaviour
     public void UnlockBow()
     {
         bowUnlocked = true;
-        rewardPanel.SetActive(true);
-        rewardPanelText.text = "Bow unlocked!";
-        StartCoroutine(DisableGameObjectAfter(rewardPanel, 3f));
+        alertPanel.SetActive(true);
+        alertPanelText.text = "Bow unlocked!";
+        StartCoroutine(DisableGameObjectAfter(alertPanel, 3f));
         Debug.Log("Reward acquired: bow");
     }
 
@@ -561,6 +571,16 @@ public class TPMovement_Controller : MonoBehaviour
     {
         yield return new WaitForSeconds(disableAfterSeconds);
         objectToDisable.SetActive(false);
+    }
+
+    private float GetAutoAttackDamage(float multiplier, Vector3 particleSpawnPos, bool spawnParticle)
+    {
+        if(spawnParticle)
+        {
+            Instantiate(hitObjectParticle, particleSpawnPos, Quaternion.identity);
+            Debug.Log("SHOULD SPAWN");
+        }      
+        return autoAttackDamage * multiplier;
     }
 
     public void Attack1()
@@ -574,8 +594,8 @@ public class TPMovement_Controller : MonoBehaviour
             }
             else if (hit.transform.CompareTag("AI"))
             {
-                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(autoAttackDamage * 0.65f, 0, this.gameObject);
-                UpdateRageAndRageBar(autoAttackDamage * 0.65f);
+                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(0.65f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0, this.gameObject);
+                UpdateRageAndRageBar(GetAutoAttackDamage(0.65f, Vector3.zero, false));
             }
         }
     }
@@ -591,8 +611,8 @@ public class TPMovement_Controller : MonoBehaviour
             }
             else if (hit.transform.CompareTag("AI"))
             {
-                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(autoAttackDamage * 1.1f, autoKnockbackPower, this.gameObject);
-                UpdateRageAndRageBar(autoAttackDamage * 1.1f);
+                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), autoKnockbackPower, this.gameObject);
+                UpdateRageAndRageBar(GetAutoAttackDamage(1.1f, Vector3.zero, false));
             }
         }
     }
@@ -605,7 +625,7 @@ public class TPMovement_Controller : MonoBehaviour
         {
             if(hit.CompareTag("AI"))
             {
-                hit.GetComponent<EnemyAI_Controller>().TakeDamage(autoAttackDamage * 0.5f, 0f, this.gameObject);             
+                hit.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(0.5f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0f, this.gameObject);             
             }
         }
     }
@@ -725,6 +745,28 @@ public class TPMovement_Controller : MonoBehaviour
         }
     }
 
+    public void SetQuestPanelState(bool stateValue)
+    {
+        questPanel.SetActive(stateValue);
+    }
+
+    private void CheckForInteractables()
+    {
+        if(interactableCheckedTimestamp <= Time.time)
+        {
+            interactableCheckedTimestamp = Time.time + checkForInteractableAlertEveryXSeconds;
+            Collider[] hitColliders = Physics.OverlapSphere(transform.position, interactionRange, interactionLayer);
+            if(hitColliders.Length > 0)
+            {
+                interactableAlertText.SetActive(true);
+            }
+            else
+            {
+                interactableAlertText.SetActive(false);
+            }                 
+        }       
+    }
+
     private void ResetAllElapsedAttackDurations()
     {
       //  Debug.Log("A1: " + elapsedAttackDuration);
@@ -783,6 +825,11 @@ public class TPMovement_Controller : MonoBehaviour
                 break; //stop at the first interaction; prevent unexpected behaviour if multiple interactables are in one place
             }
         }
+    }
+
+    private void HandleToggleQuestPanel(InputAction.CallbackContext context)
+    {
+        questPanel.SetActive(!questPanel.activeSelf);
     }
 
     private void HandleLockedOrbit(InputAction.CallbackContext context)
