@@ -62,7 +62,7 @@ namespace BrokenVector.LowPolyFencePack
                 Debug.LogError("Every DoorController needs an Animator.");
                 return;
             }
-            boxColl = GetComponent<BoxCollider>();
+         //   boxColl = GetComponent<BoxCollider>();
             // animator settings
             animator.playAutomatically = false;
 
@@ -114,7 +114,7 @@ namespace BrokenVector.LowPolyFencePack
             else
                 OpenDoor();
 
-            boxColl.enabled = !boxColl.enabled;
+        //    boxColl.enabled = !boxColl.enabled;
         }
 
         private void Animate()

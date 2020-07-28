@@ -6,13 +6,15 @@ using UnityEngine;
 
 public class KnockableObject : MonoBehaviour, IKnockback
 {
+    public string knockableTag = "Knockable"; //set automatically for ease of use
     public float knockBackSuffer = 25f;
-    public bool roll = true;
+    public bool roll = false;
     private Rigidbody rb;
     private Vector3 direction;
 
     private void Start()
     {
+        this.gameObject.tag = "Knockable";
         rb = GetComponent<Rigidbody>();
         direction = transform.forward;
     }

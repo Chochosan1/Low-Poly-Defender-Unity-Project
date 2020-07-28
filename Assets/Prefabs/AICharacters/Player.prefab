@@ -3492,6 +3492,8 @@ GameObject:
   - component: {fileID: 7230360774452582743}
   - component: {fileID: 7230360774452582741}
   - component: {fileID: 7228862983892451218}
+  - component: {fileID: 1992878385}
+  - component: {fileID: 1992878384}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -3614,7 +3616,7 @@ CapsuleCollider:
   m_Material: {fileID: 13400000, guid: f5aca5c2225fdd1408ebab72e98e43e8, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.42
   m_Height: 1.76
   m_Direction: 1
   m_Center: {x: 0, y: 0.8939382, z: 0}
@@ -3644,28 +3646,35 @@ MonoBehaviour:
     type: 3}
   rageBar: {fileID: 0}
   rageBarAnim: {fileID: 0}
+  alertPanel: {fileID: 0}
+  questPanel: {fileID: 0}
+  interactableAlertText: {fileID: 0}
+  hitObjectParticle: {fileID: 100000, guid: f06e78284f831ae469c74624ab5d513b, type: 3}
   cursorTexture: {fileID: 2800000, guid: a5f9cc9a5efbe894eb85de4851711ba8, type: 3}
   cursorMode: 0
   cursorHotSpot: {x: 0, y: 0}
   maxHealth: 100
   maxRage: 1000
-  walkSpeed: 2000
-  sprintSpeed: 3000
+  maxAngle: 135
+  walkSpeed: 2350
+  sprintSpeed: 3350
   rotationSpeed: 180
   jumpForce: 50
   rollForwardForce: 125
   rollCooldown: 4
   turnSmoothTime: 10
   maxRollDuration: 1.3
-  autoAttackDamage: 100
+  autoAttackDamage: 200
   attackRange: 10
   autoKnockbackPower: 10
   attack1MaxDuration: 0.75
+  attack1ForwardLungeForce: 20
   attack2MaxDuration: 0.8
-  attack2RageRequirement: 350
+  attack2RageRequirement: 0
   attack3MaxDuration: 1
-  attack3RageRequirement: 750
+  attack3RageRequirement: 0
   attack3Radius: 2
+  bowUnlocked: 1
   maxSwitchEquipmentDuration: 1.2
   attackYoffset: 0.5
   enemyLayer:
@@ -3674,7 +3683,8 @@ MonoBehaviour:
   interactionRange: 2
   interactionLayer:
     serializedVersion: 2
-    m_Bits: 512
+    m_Bits: 1024
+  checkForInteractableAlertEveryXSeconds: 2
 --- !u!114 &7228862983892451218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3687,6 +3697,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9134891b161b0645aa68a15538f63ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!81 &1992878385
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228862983892451219}
+  m_Enabled: 1
+--- !u!114 &1992878384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7228862983892451219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bffad86dbea1147439c6238cb8f93900, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text_Quests:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &7228877420235180655
 GameObject:
   m_ObjectHideFlags: 0
