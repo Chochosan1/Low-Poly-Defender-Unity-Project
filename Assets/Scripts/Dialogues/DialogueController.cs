@@ -45,17 +45,15 @@ public class DialogueController : MonoBehaviour, IInteractable
     private float originalTypeWriteDelay;
     private static bool is_Interacted = false; //static flag to control all objects, if one is currently being interacted with don't call the coroutine again
 
-    [Header("Exploring")]
-    [SerializeField]
-    private float expForInteraction;
-    public float ExpForInteraction { get { return expForInteraction; } set { expForInteraction = value; } }
-    private bool alreadyGainedExp = false;
-
-
-
     private void Start()
     {
         originalTypeWriteDelay = typeWriterDelay; //save the original delay  
+
+        //necessary for the questGiver to tell his story before giving the quest
+        if(questGiver)
+        {
+            storyMode = true; 
+        }
     }
 
 
@@ -75,30 +73,28 @@ public class DialogueController : MonoBehaviour, IInteractable
     {
         if (Vector3.Distance(TPMovement_Controller.instance.transform.position, transform.position) <= interactionRange)
         {
-            if (!is_Interacted && !storyMode)
+            if (!is_Interacted && !storyMode) //random NPC with no story, just says a random phrase
             {
-                if (!alreadyGainedExp)
-                {
-                    if (ExpForInteraction > 0)
-                    {
-                        string displayText = "+" + ExpForInteraction.ToString() + " explorer points";
-                    }
-                    alreadyGainedExp = true;
-                }
                 currMessageIndex = Random.Range(0, messages.Length); //pick a random message to say
                 StartCoroutine(TypeWriterEffect());
             }
-            else if (!is_Interacted && storyMode && !storyComplete && !proximityMessagePop)
+            else if (!is_Interacted && storyMode && !storyComplete && !proximityMessagePop && !questGiver) //story NPC that can be interacted with only once and does not give quests
             {
-                if (!alreadyGainedExp)
-                {
-                    if (ExpForInteraction > 0)
-                    {
-                        string displayText = "+" + ExpForInteraction.ToString() + " explorer points";
-                    }
-                    alreadyGainedExp = true;
-                }
                 StartCoroutine(StoryTypeWriterEffect());
+            }
+            else if (!is_Interacted && storyMode && !proximityMessagePop && questGiver) //gives you your quest rewards if quest is complete OR tells you a story just once and gives you a quest
+            {
+                if (Player_Location.instance.GetComponent<QuestComponent>().IsQuestComplete(questID))
+                {
+                    Player_Location.instance.GetComponent<QuestComponent>().ClaimQuestRewards(questID);
+                }
+                else
+                {
+                    if (!storyComplete)
+                    {
+                        StartCoroutine(StoryTypeWriterEffect()); //tells you a story and gives you a quest if tagged as a questgiver
+                    }
+                }
             }
             else //make the delay faster if the user is annoyed; allow him to smash the interaction key to see the whole text faster
             {
@@ -171,9 +167,9 @@ public class DialogueController : MonoBehaviour, IInteractable
         storyComplete = true;
 
         //the player should have the QuestComponent class
-        if(questGiver)
+        if (questGiver && !Player_Location.instance.GetComponent<QuestComponent>().IsQuestComplete(questID))
         {
-            Player_Location.instance.GetComponent<QuestComponent>().AcceptQuest(questID);
+            Player_Location.instance.GetComponent<QuestComponent>().AcceptQuest(questID, nameDisplay);
         }
     }
 }

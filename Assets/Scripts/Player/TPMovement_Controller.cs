@@ -69,6 +69,7 @@ public class TPMovement_Controller : MonoBehaviour
     public float autoKnockbackPower = 10f;
     [Tooltip("Attack animation and state will not last longer than this value after going into that state.")]
     public float attack1MaxDuration = 0.75f;
+    [Tooltip("How much forward should the player move while performing the attack?")]
     public float attack1ForwardLungeForce = 25f;
     [Tooltip("Attack animation and state will not last longer than this value after going into that state.")]
     public float attack2MaxDuration = 0.8f;
@@ -93,6 +94,7 @@ public class TPMovement_Controller : MonoBehaviour
     [Header("Misc")]
     public float interactionRange;
     public LayerMask interactionLayer;
+    [Tooltip("How often should the player check for interactable objects around him? Used to show the interactable alert text. Higher value means less raycasting.")]
     public float checkForInteractableAlertEveryXSeconds = 2f;
     private float interactableCheckedTimestamp;
 
@@ -167,6 +169,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.EquipmentSwitch.performed += HandleEquipmentSwitch;
         controls.MainControls.Interact.performed += HandleInteract;
         controls.MainControls.ToggleQuestPanel.performed += HandleToggleQuestPanel;
+        controls.MainControls.ToggleInventoryPanel.performed += HandleToggleInventory;
         controls.MainControls.Movement.Enable();
         controls.MainControls.SprintToggle.Enable();
         controls.MainControls.LockedOrbit.Enable();
@@ -181,6 +184,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.EquipmentSwitch.Enable();
         controls.MainControls.Interact.Enable();
         controls.MainControls.ToggleQuestPanel.Enable();
+        controls.MainControls.ToggleInventoryPanel.Enable();
     }
 
     private void OnDisable()
@@ -203,6 +207,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.EquipmentSwitch.performed -= HandleEquipmentSwitch;
         controls.MainControls.Interact.performed -= HandleInteract;
         controls.MainControls.ToggleQuestPanel.performed -= HandleToggleQuestPanel;
+        controls.MainControls.ToggleInventoryPanel.performed -= HandleToggleInventory;
         controls.MainControls.Movement.Disable();
         controls.MainControls.SprintToggle.Disable();
         controls.MainControls.LockedOrbit.Disable();
@@ -217,6 +222,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.EquipmentSwitch.Disable();
         controls.MainControls.Interact.Disable();
         controls.MainControls.ToggleQuestPanel.Disable();
+        controls.MainControls.ToggleInventoryPanel.Disable();
     }
     #endregion
 
@@ -750,6 +756,7 @@ public class TPMovement_Controller : MonoBehaviour
         questPanel.SetActive(stateValue);
     }
 
+    //alert if there is an interactable nearby
     private void CheckForInteractables()
     {
         if(interactableCheckedTimestamp <= Time.time)
@@ -825,6 +832,11 @@ public class TPMovement_Controller : MonoBehaviour
                 break; //stop at the first interaction; prevent unexpected behaviour if multiple interactables are in one place
             }
         }
+    }
+
+    private void HandleToggleInventory(InputAction.CallbackContext context)
+    {
+       
     }
 
     private void HandleToggleQuestPanel(InputAction.CallbackContext context)

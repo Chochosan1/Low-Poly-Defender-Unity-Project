@@ -116,6 +116,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ToggleInventoryPanel",
+                    "type": "Button",
+                    "id": "f68174d8-035b-4421-ae40-dbbe77ddebec",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -314,6 +322,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleQuestPanel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3b28dfa-1fa4-4aca-82db-19893fcc8467",
+                    "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleInventoryPanel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

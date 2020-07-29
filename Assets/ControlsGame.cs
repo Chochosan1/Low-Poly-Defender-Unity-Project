@@ -129,6 +129,14 @@ public class @ControlsGame : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""ToggleInventoryPanel"",
+                    ""type"": ""Button"",
+                    ""id"": ""f68174d8-035b-4421-ae40-dbbe77ddebec"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -329,6 +337,17 @@ public class @ControlsGame : IInputActionCollection, IDisposable
                     ""action"": ""ToggleQuestPanel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3b28dfa-1fa4-4aca-82db-19893fcc8467"",
+                    ""path"": ""<Keyboard>/i"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleInventoryPanel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -357,6 +376,7 @@ public class @ControlsGame : IInputActionCollection, IDisposable
         m_MainControls_Attackthree = m_MainControls.FindAction("Attack three", throwIfNotFound: true);
         m_MainControls_Interact = m_MainControls.FindAction("Interact", throwIfNotFound: true);
         m_MainControls_ToggleQuestPanel = m_MainControls.FindAction("ToggleQuestPanel", throwIfNotFound: true);
+        m_MainControls_ToggleInventoryPanel = m_MainControls.FindAction("ToggleInventoryPanel", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -420,6 +440,7 @@ public class @ControlsGame : IInputActionCollection, IDisposable
     private readonly InputAction m_MainControls_Attackthree;
     private readonly InputAction m_MainControls_Interact;
     private readonly InputAction m_MainControls_ToggleQuestPanel;
+    private readonly InputAction m_MainControls_ToggleInventoryPanel;
     public struct MainControlsActions
     {
         private @ControlsGame m_Wrapper;
@@ -438,6 +459,7 @@ public class @ControlsGame : IInputActionCollection, IDisposable
         public InputAction @Attackthree => m_Wrapper.m_MainControls_Attackthree;
         public InputAction @Interact => m_Wrapper.m_MainControls_Interact;
         public InputAction @ToggleQuestPanel => m_Wrapper.m_MainControls_ToggleQuestPanel;
+        public InputAction @ToggleInventoryPanel => m_Wrapper.m_MainControls_ToggleInventoryPanel;
         public InputActionMap Get() { return m_Wrapper.m_MainControls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -489,6 +511,9 @@ public class @ControlsGame : IInputActionCollection, IDisposable
                 @ToggleQuestPanel.started -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleQuestPanel;
                 @ToggleQuestPanel.performed -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleQuestPanel;
                 @ToggleQuestPanel.canceled -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleQuestPanel;
+                @ToggleInventoryPanel.started -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleInventoryPanel;
+                @ToggleInventoryPanel.performed -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleInventoryPanel;
+                @ToggleInventoryPanel.canceled -= m_Wrapper.m_MainControlsActionsCallbackInterface.OnToggleInventoryPanel;
             }
             m_Wrapper.m_MainControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -535,6 +560,9 @@ public class @ControlsGame : IInputActionCollection, IDisposable
                 @ToggleQuestPanel.started += instance.OnToggleQuestPanel;
                 @ToggleQuestPanel.performed += instance.OnToggleQuestPanel;
                 @ToggleQuestPanel.canceled += instance.OnToggleQuestPanel;
+                @ToggleInventoryPanel.started += instance.OnToggleInventoryPanel;
+                @ToggleInventoryPanel.performed += instance.OnToggleInventoryPanel;
+                @ToggleInventoryPanel.canceled += instance.OnToggleInventoryPanel;
             }
         }
     }
@@ -564,5 +592,6 @@ public class @ControlsGame : IInputActionCollection, IDisposable
         void OnAttackthree(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnToggleQuestPanel(InputAction.CallbackContext context);
+        void OnToggleInventoryPanel(InputAction.CallbackContext context);
     }
 }
