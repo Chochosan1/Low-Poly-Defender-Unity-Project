@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class QuestComponent : MonoBehaviour
 {
     private TPMovement_Controller playerController;
+    private Player_Inventory playerInventory;
     public Text[] text_Quests;
 
     private List<Quest> quests;
@@ -83,6 +84,7 @@ public class QuestComponent : MonoBehaviour
             this.questDescription = questDescription;
         }
 
+
         //Quest objectives
         public string questDescription;
         public string enemyToSlayNameContains;
@@ -146,10 +148,21 @@ public class QuestComponent : MonoBehaviour
                     Player_Location.instance.gameObject.GetComponent<TPMovement_Controller>().UnlockBow();
                     Debug.Log("Bow unlocked");
                 }
-                Player_Inventory.totalGold += goldReward;
-                Player_Inventory.totalSkillPoints += skillPointsReward;
-                Debug.Log("Gold: " + Player_Inventory.totalGold + " || Points: " + Player_Inventory.totalSkillPoints);
+                Player_Inventory.instance.TotalGold += goldReward;
+                Player_Inventory.instance.TotalSkillPoints += skillPointsReward;
+
+                Debug.Log("Gold: " + Player_Inventory.instance.TotalGold + " || Points: " + Player_Inventory.instance.TotalSkillPoints);
             }
+        }
+
+        private void AddGold(int gold)
+        {
+            
+        }
+
+        private void AddTalentPoint(int talentPoints)
+        {
+            
         }
         #endregion
     }

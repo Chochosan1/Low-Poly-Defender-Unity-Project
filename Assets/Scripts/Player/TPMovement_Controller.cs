@@ -33,6 +33,7 @@ public class TPMovement_Controller : MonoBehaviour
     public GameObject alertPanel;
     private UnityEngine.UI.Text alertPanelText;
     public GameObject questPanel;
+    public GameObject inventoryPanel;
     public GameObject interactableAlertText;
     public GameObject hitObjectParticle;
     [Header("Cursor options")]
@@ -836,7 +837,7 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleToggleInventory(InputAction.CallbackContext context)
     {
-       
+        inventoryPanel.SetActive(!inventoryPanel.activeSelf);
     }
 
     private void HandleToggleQuestPanel(InputAction.CallbackContext context)
