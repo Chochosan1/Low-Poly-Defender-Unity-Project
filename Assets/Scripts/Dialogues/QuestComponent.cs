@@ -21,7 +21,7 @@ public class QuestComponent : MonoBehaviour
         quests = new List<Quest>
         {
             new Quest("EnemyDouble", 3, 10, 1, "Slay 3 enemy swordsmen. [Lazo] asks you to help him get rid of his molesters, will you help?"),
-            new Quest("EnemyBow", 2, 20, 2, "Slay 2 enemy bowmen. [Khasto] can no longer watch his adorable puppies suffer everytime the bowmen practise their aim. ")
+            new Quest("EnemyBow", 2, 0, 0, "Slay 2 enemy bowmen. [Khasto] can no longer watch his adorable puppies suffer everytime the bowmen practise their aim. ")
         };
 
         quests[1].ShouldUnlockBow = true;
@@ -153,16 +153,6 @@ public class QuestComponent : MonoBehaviour
 
                 Debug.Log("Gold: " + Player_Inventory.instance.TotalGold + " || Points: " + Player_Inventory.instance.TotalSkillPoints);
             }
-        }
-
-        private void AddGold(int gold)
-        {
-            
-        }
-
-        private void AddTalentPoint(int talentPoints)
-        {
-            
         }
         #endregion
     }

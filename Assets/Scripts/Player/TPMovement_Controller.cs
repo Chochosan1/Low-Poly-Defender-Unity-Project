@@ -31,7 +31,7 @@ public class TPMovement_Controller : MonoBehaviour
     public UnityEngine.UI.Slider rageBar;
     public Animator rageBarAnim;
     public GameObject alertPanel;
-    private UnityEngine.UI.Text alertPanelText;
+    private TMPro.TextMeshProUGUI alertPanelText;
     public GameObject questPanel;
     public GameObject inventoryPanel;
     public GameObject interactableAlertText;
@@ -136,7 +136,7 @@ public class TPMovement_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
-        alertPanelText = alertPanel.GetComponentInChildren<UnityEngine.UI.Text>();
+        alertPanelText = alertPanel.GetComponentInChildren<TMPro.TextMeshProUGUI>();
 
         Cursor.SetCursor(cursorTexture, cursorHotSpot, cursorMode);
         Cursor.lockState = CursorLockMode.Locked;
