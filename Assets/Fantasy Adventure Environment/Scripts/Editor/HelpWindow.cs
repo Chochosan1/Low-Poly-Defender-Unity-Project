@@ -110,15 +110,15 @@ namespace FAE
         {
             SetWindowHeight(335);
 
-            EditorGUILayout.LabelField("Render pipeline installation", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("Render pipeline conversion", EditorStyles.boldLabel);
 
 #if !UNITY_2019_3_OR_NEWER
 
-            EditorGUILayout.HelpBox("Universal Render Pipeline support requires Unity 2019.3 or newer", MessageType.Info);
+            EditorGUILayout.HelpBox("Universal Render Pipeline support requires Unity 2019.3f6 or newer", MessageType.Info);
 #else
             if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset == null)
             {
-                //EditorGUILayout.HelpBox("No Scriptable Render Pipeline is currently active", MessageType.Info);
+                EditorGUILayout.HelpBox("No Scriptable Render Pipeline is currently active", MessageType.Warning);
             }
             EditorGUILayout.BeginHorizontal();
             {
@@ -127,9 +127,12 @@ namespace FAE
                     FAE_Core.InstallShaders(FAE_Core.ShaderInstallation.BuiltIn);
                 }
 
-                if (GUILayout.Button("<b><size=16>Universal RP</size></b>\n<i>Shader Graph shaders</i>", Button))
+                using (new EditorGUI.DisabledGroupScope(UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset == null))
                 {
-                    FAE_Core.InstallShaders(FAE_Core.ShaderInstallation.UniversalRP);
+                    if (GUILayout.Button("<b><size=16>Universal RP</size></b>\n<i>Shader Graph shaders</i>", Button))
+                    {
+                        FAE_Core.InstallShaders(FAE_Core.ShaderInstallation.UniversalRP);
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();

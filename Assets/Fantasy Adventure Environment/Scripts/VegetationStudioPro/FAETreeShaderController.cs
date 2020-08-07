@@ -61,13 +61,14 @@ namespace AwesomeTechnologies.Shaders
             {
                 Heading = "Fantasy Adventure Environment Tree",
                 Description = "",
-                LODFadePercentage = false,
-                LODFadeCrossfade = false,
+                LODFadePercentage = true,
+                LODFadeCrossfade = true,
                 SampleWind = true,
                 SupportsInstantIndirect = true
             };
 
             Settings.AddLabelProperty("Branch");
+            Settings.AddColorProperty("Color", "Main color", "", ShaderControllerSettings.GetColorFromMaterials(materials, "_Color"));
             Settings.AddColorProperty("HueVariation", "Hue Variation", "",
                 ShaderControllerSettings.GetColorFromMaterials(materials, "_HueVariation"));
             Settings.AddColorProperty("TransmissionColor", "Transmission Color", "",
@@ -102,6 +103,7 @@ namespace AwesomeTechnologies.Shaders
             }
             else
             {
+                material.SetColor("_Color", Settings.GetColorPropertyValue("Color"));
                 material.SetColor("_HueVariation", Settings.GetColorPropertyValue("HueVariation"));
                 material.SetColor("_TransmissionColor", Settings.GetColorPropertyValue("TransmissionColor"));
                 material.SetFloat("_AmbientOcclusion", Settings.GetFloatPropertyValue("AmbientOcclusionBranch"));

@@ -154,13 +154,17 @@ Shader "FAE/Water" {
                 d.worldPos = i.posWorld.xyz;
                 d.worldViewDir = viewDirection;
                 d.atten = attenuation;
-                d.boxMax[0] = unity_SpecCube0_BoxMax;
+				#if defined(UNITY_SPECCUBE_BLENDING) || defined(UNITY_SPECCUBE_BOX_PROJECTION) || defined(UNITY_ENABLE_REFLECTION_BUFFERS)
                 d.boxMin[0] = unity_SpecCube0_BoxMin;
-                d.probePosition[0] = unity_SpecCube0_ProbePosition;
-                d.probeHDR[0] = unity_SpecCube0_HDR;
-                d.boxMax[1] = unity_SpecCube1_BoxMax;
                 d.boxMin[1] = unity_SpecCube1_BoxMin;
+				#endif
+				#ifdef UNITY_SPECCUBE_BOX_PROJECTION
+                d.boxMax[0] = unity_SpecCube0_BoxMax;
+                d.boxMax[1] = unity_SpecCube1_BoxMax;
+                d.probePosition[0] = unity_SpecCube0_ProbePosition;
                 d.probePosition[1] = unity_SpecCube1_ProbePosition;
+                #endif
+                d.probeHDR[0] = unity_SpecCube0_HDR;
                 d.probeHDR[1] = unity_SpecCube1_HDR;
                 Unity_GlossyEnvironmentData ugls_en_data;
                 ugls_en_data.roughness = 1.0 - gloss;

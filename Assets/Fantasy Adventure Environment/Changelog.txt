@@ -1,3 +1,12 @@
+1.5.2
+
+Added:
+- Options to convert to Built/Universal Render Pipeline under Edit/Render Pipeline menu
+- Color (HDR) field to tree branch shader. Transmission color is now also HDR-enabled.
+
+Fixed:
+- Errors in built-in water shader when reflection probe box projection wasn't enabled
+
 1.5.1
 
 Added:

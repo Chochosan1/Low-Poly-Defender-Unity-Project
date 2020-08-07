@@ -20,7 +20,7 @@ namespace FAE
         public const string ASSET_ID = "70354";
 
         public const string PACKAGE_VERSION = "20174";
-        public static string INSTALLED_VERSION = "1.5.1";
+        public static string INSTALLED_VERSION = "1.5.2";
         public const string MIN_UNITY_VERSION = "2017.4";
 
         public static string DOC_URL = "http://staggart.xyz/unity/fantasy-adventure-environment/fae-documentation/";
@@ -89,7 +89,6 @@ namespace FAE
                 }
             }
         }
-#endif
 
         private const string urpName = "Universal Render Pipeline";
 
@@ -121,6 +120,32 @@ namespace FAE
             { "FAE/Tree Trunk", urpName+ "/FAE/FAE_TreeTrunk" },
             { "FAE/Tree Billboard", urpName+ "/FAE/FAE_TreeBillboard" }
         };
+
+        [MenuItem("Edit/Render Pipeline/Fantasy Adventure Environment/Revert to Built-in")]
+        public static void InstallBuiltIn()
+        {
+            InstallShaders(ShaderInstallation.BuiltIn);
+        }
+
+        [MenuItem("Edit/Render Pipeline/Fantasy Adventure Environment/Convert to URP")]
+        public static void InstallURP()
+        {
+
+#if UNITY_2019_3_OR_NEWER && FAE_DEV
+            SwitchRenderPipeline.SetPipeline(ShaderInstallation.UniversalRP);
+#endif
+
+            if (UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset == null)
+            {
+                if (EditorUtility.DisplayDialog("Fantasy Adventure Environment", "No URP asset has been assigned in the Graphics settings. URP should be set up, before converting the package.", "Show me", "Cancel"))
+                {
+                    SettingsService.OpenProjectSettings("Project/Graphics");
+                    return;
+                }
+            }
+
+            InstallShaders(ShaderInstallation.UniversalRP);
+        }
 
         public static void InstallShaders(ShaderInstallation config)
         {
@@ -217,6 +242,9 @@ namespace FAE
 
                         if (config == ShaderInstallation.UniversalRP)
                         {
+                            Texture mainTex = null;
+                            if (mats[i].HasProperty("_MainTex")) mainTex = mats[i].GetTexture("_MainTex");
+
                             if ((source.Contains("WindStreak") || source.Contains("Fogsheets")))
                             {
                                 //mats[i].EnableKeyword("_ALPHATEST_ON");
@@ -247,7 +275,11 @@ namespace FAE
                             if (mats[i].name.Contains("Grass"))
                             {
                                 mats[i].SetFloat("_MaxWindStrength", 0.2f);
+                                mats[i].SetFloat("_AmbientOcclusion", 0.15f);
                             }
+
+                            mats[i].shader = Shader.Find(dest);
+                            if (mainTex) mats[i].SetTexture("_BaseMap", mainTex);
                         }
 
                         if (mats[i].HasProperty("_TransmissionAmount"))
@@ -270,6 +302,12 @@ namespace FAE
                 }
                 EditorUtility.ClearProgressBar();
 
+
+                Debug.Log(count + " materials were configured for the " + config + " render pipeline");
+
+                AssetDatabase.Refresh();
+                AssetDatabase.SaveAssets();
+
                 //If any controllers are present in the open scene, these need to be nudged to apply the correct shaders
                 CliffAppearance[] cliffConstrollers = GameObject.FindObjectsOfType<CliffAppearance>();
                 for (int i = 0; i < cliffConstrollers.Length; i++)
@@ -277,12 +315,16 @@ namespace FAE
                     cliffConstrollers[i].OnEnable();
                 }
 
-                Debug.Log(count + " materials were configured for the " + config + " render pipeline");
-
-                AssetDatabase.Refresh();
-                AssetDatabase.SaveAssets();
+                if (config == ShaderInstallation.UniversalRP)
+                {
+                    if (EditorUtility.DisplayDialog("Fantasy Adventure Environment", "Ensure the Depth/Opaque Texture options are enabled in your pipeline settings, otherwise the water isn't visible in the game view", "Show me", "OK"))
+                    {
+                        Selection.activeObject = UnityEngine.Rendering.GraphicsSettings.renderPipelineAsset;
+                    }
+                }
             }
         }
+#endif
     }
 }//namespace
 #endif //If Unity Editor

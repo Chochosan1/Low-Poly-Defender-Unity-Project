@@ -122,7 +122,7 @@ Material:
     - WindSpeed: 0.3
     - _AO: 0
     - _ASEOutlineWidth: 0
-    - _AmbientOcclusion: 0.6
+    - _AmbientOcclusion: 0.4
     - _BendingInfluence: 1
     - _BendingRadius: 1.5
     - _BendingStiffness: 1
@@ -174,7 +174,7 @@ Material:
     - _TerrainOffsetY: 250
     - _TerrainSize: 500
     - _TransmissionAmount: 10
-    - _TransmissionSize: 20
+    - _TransmissionSize: 10
     - _Transmissionsize: 0
     - _UVSec: 0
     - _Uselightcolor: 0
@@ -194,7 +194,7 @@ Material:
     - ObstaclePosition: {r: 0, g: 0, b: 0, a: 0}
     - WindDirection: {r: 0, g: 0, b: 1, a: 0}
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.3158577, g: 0.6102941, b: 0.02692473, a: 1}
+    - _Color: {r: 0.31585774, g: 0.6102941, b: 0.02692473, a: 1}
     - _ColorBottom: {r: 0.25492513, g: 0.5147059, b: 0, a: 1}
     - _ColorTop: {r: 0.31585774, g: 0.6102941, b: 0.02692473, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

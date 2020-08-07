@@ -71,7 +71,7 @@ void SampleWind_float(in float2 wPos, out float3 vec)
 };
 
 void GetLODFactor_float(out float f) {
-	f = 1-unity_LODFade.x;
+	f = unity_LODFade.x;
 }
 
 void LODDithering_float(in float alpha, in float4 clipPos, out float dither) {

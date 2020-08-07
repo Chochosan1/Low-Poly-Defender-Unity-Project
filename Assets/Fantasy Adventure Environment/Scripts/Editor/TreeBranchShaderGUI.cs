@@ -20,6 +20,7 @@ namespace FAE
         MaterialProperty _BumpMap;
 
         //Color
+        MaterialProperty _Color;
         MaterialProperty _HueVariation;
         MaterialProperty _AmbientOcclusion;
         MaterialProperty _TransmissionColor;
@@ -99,7 +100,8 @@ namespace FAE
             EditorGUILayout.PrefixLabel(_MaskClipValue.displayName);
             _MaskClipValue.floatValue = EditorGUILayout.Slider(_MaskClipValue.floatValue, 0f, 1f);
             EditorGUILayout.EndHorizontal();
-            this.m_MaterialEditor.TexturePropertySingleLine(mainTexName, this._MainTex);
+
+            this.m_MaterialEditor.TexturePropertySingleLine(mainTexName, this._MainTex, this._Color);
             this.m_MaterialEditor.TexturePropertySingleLine(normalMapName, this._BumpMap);
 
             EditorGUILayout.Space();
@@ -185,6 +187,7 @@ namespace FAE
             _UseSpeedTreeWind = FindProperty("_UseSpeedTreeWind", props);
 
             //Main maps
+            _Color = FindProperty("_Color", props);
             _MainTex = FindProperty("_MainTex", props);
             _BumpMap = FindProperty("_BumpMap", props);
 

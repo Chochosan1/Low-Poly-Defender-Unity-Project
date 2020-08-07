@@ -71,14 +71,14 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
-    - _Depth: 10
+    - _Depth: 8
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _DustSpeed: 0
     - _DustStrength: 1
     - _Emission: 1
     - _Factor: 0.1
-    - _FadeDistance: 0.5
+    - _FadeDistance: 0.82
     - _Float0: 0.805
     - _GlossMapScale: 1
     - _Glossiness: 0.5
