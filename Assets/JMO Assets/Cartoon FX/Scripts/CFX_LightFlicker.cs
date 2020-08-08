@@ -20,10 +20,13 @@ public class CFX_LightFlicker : MonoBehaviour
 	private float minIntensity;
 	private float maxIntensity;
 	private float baseIntensity;
+
+    private Light currentLight;
 	
 	void Awake()
 	{
-		baseIntensity = GetComponent<Light>().intensity;
+        currentLight = GetComponent<Light>();
+		baseIntensity = currentLight.intensity;
 	}
 	
 	void OnEnable()
@@ -34,6 +37,6 @@ public class CFX_LightFlicker : MonoBehaviour
 	
 	void Update ()
 	{
-		GetComponent<Light>().intensity = Mathf.Lerp(minIntensity, maxIntensity, Mathf.PerlinNoise(Time.time * smoothFactor, 0f));
+		currentLight.intensity = Mathf.Lerp(minIntensity, maxIntensity, Mathf.PerlinNoise(Time.time * smoothFactor, 0f));
 	}
 }

@@ -25,12 +25,16 @@ public class DayNight_Manager : MonoBehaviour
     [SerializeField]
     private Material nightSkybox, daySkybox;
     [SerializeField]
+    private float nightSkyboxRotationSpeed = 1f;
+    [SerializeField]
     [Tooltip("The main light.")]
     private Light sunLight;
     private Color32 daySunColor;
     private Color32 nightSunColor;
     private Color32 ambientDayColor;
     private Color32 ambientNightColor;
+    private float fullNightSkyboxExposure = 0.9f;
+    private float fullDaySkyboxExposure = 1.2f;
     [SerializeField]
     [Tooltip("How long it will take to swap between day and night.")]
     private float cycleDuration = 5f;
@@ -41,6 +45,7 @@ public class DayNight_Manager : MonoBehaviour
     private float cyclePauseDuration; //the final result after applying the pauseMultiplier to the duration
     private bool isCurrentlyPaused;
     private bool isLightsOn;
+    private bool isShadowsOn;
     private float elapsedCycleTime = 0f;
 
     private CurrentTimeState currentTimeState;
@@ -50,7 +55,7 @@ public class DayNight_Manager : MonoBehaviour
         currentTimeState = CurrentTimeState.Day;
 
         daySunColor = new Color32(245, 241, 115, 255);
-        nightSunColor = new Color32(0, 0, 0, 255);
+        nightSunColor = new Color32(19, 45, 85, 255);
 
         ambientDayColor = new Color32(152, 152, 152, 255);
         ambientNightColor = new Color32(30, 30, 30, 255);
@@ -67,35 +72,70 @@ public class DayNight_Manager : MonoBehaviour
         //    ToggleTimeState();
         //}
         if (isCurrentlyPaused)
+        {
+            if(currentTimeState == CurrentTimeState.Night)
+            {
+                nightSkybox.SetFloat("_Rotation", nightSkybox.GetFloat("_Rotation") + (Time.deltaTime * nightSkyboxRotationSpeed));
+            }
             return;
+        }
+ 
 
         elapsedCycleTime += Time.deltaTime;
         
         if (currentTimeState == CurrentTimeState.Day && elapsedCycleTime <= cycleDuration)
         {
+            //if lights are on and the night skybox is on during the day phase then reduce the exposure before officially 
+            //switching to night state
+            if (isLightsOn)
+            {
+                nightSkybox.SetFloat("_Exposure", Mathf.Lerp(nightSkybox.GetFloat("_Exposure"), fullNightSkyboxExposure, Time.deltaTime / cycleDuration * 6));
+                nightSkybox.SetFloat("_Rotation", nightSkybox.GetFloat("_Rotation") + (Time.deltaTime * nightSkyboxRotationSpeed));
+            }
+            else
+            {
+                daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), 0.2f, Time.deltaTime / cycleDuration * 2));
+            }
             //lerp from Day brightness to Night darkness
             RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientNightColor, Time.deltaTime / cycleDuration);
             sunLight.color = Color.Lerp(sunLight.color, nightSunColor, Time.deltaTime / cycleDuration * 2);
             RenderSettings.reflectionIntensity = Mathf.Lerp(RenderSettings.reflectionIntensity, 0, Time.deltaTime / cycleDuration * 2);
-            daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), 0.2f, Time.deltaTime / cycleDuration * 2));
-
+          
             //after a certain stage is reached and if the lights are off then turn them on although it is still during the day phase 
-            if(elapsedCycleTime / cycleDuration >= 0.8 && !isLightsOn)
+            //and put on the night skybox with a higher than normal exposure (to make a seamless transition) although it is still during the day phase
+            if (elapsedCycleTime / cycleDuration >= 0.8 && !isLightsOn)
             {
                 foreach (Light light in lightsList)
                 {
                     light.gameObject.SetActive(true);
                 }
                 isLightsOn = true;
+             //   sunLight.shadows = LightShadows.None;
+                isShadowsOn = false;
+                RenderSettings.skybox = nightSkybox;
+                nightSkybox.SetFloat("_Exposure", 1f);    
             }
+
+            
         }
         else if(currentTimeState == CurrentTimeState.Night && elapsedCycleTime <= cycleDuration)
         {
+            //if lights are off and the day skybox is on during the night phase then increase the exposure before officially 
+            //switching to day state
+            if (!isLightsOn)
+            {
+                daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), fullDaySkyboxExposure, Time.deltaTime / cycleDuration * 6));
+            }
+            else
+            {
+                nightSkybox.SetFloat("_Exposure", Mathf.Lerp(nightSkybox.GetFloat("_Exposure"), 2f, Time.deltaTime / cycleDuration * 4));
+                nightSkybox.SetFloat("_Rotation", nightSkybox.GetFloat("_Rotation") + (Time.deltaTime * nightSkyboxRotationSpeed));
+            }
             //lerp from Night darkness to Day brightness
             RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientDayColor, Time.deltaTime / cycleDuration);
             sunLight.color = Color.Lerp(sunLight.color, daySunColor, Time.deltaTime / cycleDuration * 2);
             RenderSettings.reflectionIntensity = Mathf.Lerp(RenderSettings.reflectionIntensity, 1, Time.deltaTime / cycleDuration * 2);
-            nightSkybox.SetFloat("_Exposure", Mathf.Lerp(nightSkybox.GetFloat("_Exposure"), 2f, Time.deltaTime / cycleDuration * 4));
+           
 
             //after a certain stage is reached and if the lights are on then turn them off and put on the day skybox 
             //with a lower than normal exposure (to make a seamless transition) although it is still during the night phase
@@ -110,12 +150,13 @@ public class DayNight_Manager : MonoBehaviour
                 daySkybox.SetFloat("_Exposure", 0.75f);
             }
 
-            //if lights are off and the day skybox is on during the night phase then increase the exposure before officially 
-            //switching to day state
-            if(!isLightsOn)
+            if(elapsedCycleTime / cycleDuration >= 0.1 && !isShadowsOn)
             {
-                daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), 1.2f, Time.deltaTime / cycleDuration * 3));
+                isShadowsOn = true;
+              //  sunLight.shadows = LightShadows.Soft;
             }
+
+           
         }
         else
         {      
@@ -138,8 +179,8 @@ public class DayNight_Manager : MonoBehaviour
     [ContextMenu("Chochosan/Reset skybox exposures")]
     public void ResetSkyboxExposures()
     {
-        nightSkybox.SetFloat("_Exposure", 0.7f);
-        daySkybox.SetFloat("_Exposure", 1.2f);
+        nightSkybox.SetFloat("_Exposure", fullNightSkyboxExposure);
+        daySkybox.SetFloat("_Exposure", fullDaySkyboxExposure);
         Debug.Log("ChochosanTools: Skybox exposures reset.");
     }
 
@@ -160,9 +201,9 @@ public class DayNight_Manager : MonoBehaviour
     {
         SetCurrentTimeState(CurrentTimeState.Day);
         RenderSettings.reflectionIntensity = 1;
-        sunLight.shadows = LightShadows.Soft;
+       // sunLight.shadows = LightShadows.Soft;
         RenderSettings.skybox = daySkybox;
-        daySkybox.SetFloat("_Exposure", 1.2f);
+        daySkybox.SetFloat("_Exposure", fullDaySkyboxExposure);
         foreach (Light light in lightsList)
         {
             light.gameObject.SetActive(false);
@@ -174,9 +215,9 @@ public class DayNight_Manager : MonoBehaviour
     {
         SetCurrentTimeState(CurrentTimeState.Night);
         RenderSettings.reflectionIntensity = 0;
-        sunLight.shadows = LightShadows.None;
+       // sunLight.shadows = LightShadows.None;
         RenderSettings.skybox = nightSkybox;
-        nightSkybox.SetFloat("_Exposure", 0.7f);
+        nightSkybox.SetFloat("_Exposure", fullNightSkyboxExposure);
         foreach (Light light in lightsList)
         {
             light.gameObject.SetActive(true);
