@@ -13868,7 +13868,8 @@ MonoBehaviour:
   nightSkybox: {fileID: 2100000, guid: 566cc8e80ca8fe5449dfb0f0dfc4ba37, type: 2}
   daySkybox: {fileID: 2100000, guid: 3afd1c7f9b00d254a9880e3445eee85c, type: 2}
   sunLight: {fileID: 2138677392}
-  cycleDuration: 30
+  cycleDuration: 10
+  cyclePauseMultiplier: 1
 --- !u!4 &731766444 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1449767308919108155, guid: 9a7c5f0544c593c4a9a0fa484bb06791,
@@ -14155,7 +14156,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 742519043}
-  m_LocalRotation: {x: 0.12422062, y: -0.000000016075747, z: -0.000000009960836, w: 0.9922547}
+  m_LocalRotation: {x: 0.12422062, y: 0.000000019121375, z: -0.000000014367172, w: 0.9922547}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -31285,7 +31286,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1678916205}
-  m_LocalRotation: {x: 0.14220113, y: 0.000000022044963, z: 0.00000007138855, w: 0.9898378}
+  m_LocalRotation: {x: 0.14220111, y: -0.000000010936444, z: 0.00000007612669, w: 0.9898378}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -31693,7 +31694,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1687258581}
-  m_LocalRotation: {x: 0.14220114, y: 0.000000032981404, z: -0.000000004738143, w: 0.98983777}
+  m_LocalRotation: {x: 0.14220113, y: -0.000000032981404, z: 0.0000000047381428, w: 0.9898378}
   m_LocalPosition: {x: 179.67, y: 20.03, z: 486.61}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -35031,7 +35032,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872748839}
-  m_LocalRotation: {x: 0.16018224, y: -0.0000000123180985, z: -0.000000012344956,
+  m_LocalRotation: {x: 0.16018222, y: 0.0000000023906541, z: -0.0000000147318575,
     w: 0.98708755}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
