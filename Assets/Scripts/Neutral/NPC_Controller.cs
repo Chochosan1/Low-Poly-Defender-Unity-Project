@@ -17,6 +17,7 @@ public class NPC_Controller : Enemy_Base
     { 
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        agent.speed = patrolSpeed;
         SetOrigin(gameObject.transform);
     }
 

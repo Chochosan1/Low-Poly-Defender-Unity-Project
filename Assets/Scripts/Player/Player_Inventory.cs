@@ -22,6 +22,12 @@ public class Player_Inventory : MonoBehaviour
         OnInventoryVariableChange += UpdateRewardPanelText;
     }
 
+    private void OnDisable()
+    {
+        OnInventoryVariableChange -= UpdateDisplayTexts;
+        OnInventoryVariableChange -= UpdateRewardPanelText;
+    }
+
     private void Start()
     {
         rewardPanelText = rewardAlertPanel.GetComponentInChildren<TextMeshProUGUI>();

@@ -13,6 +13,11 @@ public class Enemy_Base : MonoBehaviour
     public float patrolSpeed = 2.5f;
     public float chaseSpeed = 3.5f;
     public float minIdleStayOnPatrolPoint = 3f, maxIdleStayOnPatrolPoint = 10f;
+    [SerializeField]
+    private bool isUsingWaypoints = false;
+    [SerializeField]
+    private List<Transform> waypoints;
+
     protected float idleStayOnPatrolPoint;
     protected float elapsedIdleStayOnPatrolPoint;
 
@@ -32,17 +37,25 @@ public class Enemy_Base : MonoBehaviour
     //a random REACHABLE point on the navmesh; other alternatives of picking a point might glitch the AI
     protected virtual Vector3 RandomPointInRange(Vector3 origin, float wanderZone)
     {
-     //   Vector3 randomPoint = origin + Random.insideUnitSphere * wanderZone;
-       // return new Vector3(randomPoint.x, transform.position.y, randomPoint.z);
+        Vector3 currentPatrolPoint = new Vector3(0, 0, 0);
+        //   Vector3 randomPoint = origin + Random.insideUnitSphere * wanderZone;
+        // return new Vector3(randomPoint.x, transform.position.y, randomPoint.z);
+        if (!isUsingWaypoints)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * wanderZone;
+            randomDirection += transform.position;
+            NavMeshHit hit;
+            NavMesh.SamplePosition(randomDirection, out hit, wanderZone, NavMesh.AllAreas);
+            currentPatrolPoint = hit.position;
+        }
+        else
+        {
+            currentPatrolPoint = waypoints[Random.Range(0, waypoints.Count - 1)].position;
+        }
 
-        Vector3 randomDirection = Random.insideUnitSphere * wanderZone;
-        randomDirection += transform.position;
-        NavMeshHit hit;
-        NavMesh.SamplePosition(randomDirection, out hit, wanderZone, NavMesh.AllAreas);
-        Vector3 currentPatrolPoint = hit.position;
 
         return currentPatrolPoint;
-    }   
+    }
 
     protected virtual void WanderAround(NavMeshAgent agent)
     {
