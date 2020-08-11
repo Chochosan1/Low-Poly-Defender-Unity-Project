@@ -20,7 +20,9 @@ enum MovementState { None, Idle, Forward, Backward, Left, Right, Attack, Roll, S
 public class TPMovement_Controller : MonoBehaviour
 {
     public bool debugMode = false;
-
+    public UnityEngine.UI.Text fpsText;
+    private float fpsTimestamp;
+    private int fps;
     public static TPMovement_Controller instance;
 
     [Header("Prefabs")]
@@ -230,6 +232,12 @@ public class TPMovement_Controller : MonoBehaviour
     #region Updates
     private void Update()
     {
+        if (Time.unscaledTime > fpsTimestamp)
+        {
+            int fps = (int)(1f / Time.unscaledDeltaTime);
+            fpsText.text = "FPS: " + fps;
+            fpsTimestamp = Time.unscaledTime + 1f;
+        }
         if (movementState == MovementState.Idle)
         {
             anim.SetBool("is_WalkBackward", false);

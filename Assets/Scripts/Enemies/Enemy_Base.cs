@@ -13,8 +13,17 @@ public class Enemy_Base : MonoBehaviour
     public float patrolSpeed = 2.5f;
     public float chaseSpeed = 3.5f;
     public float minIdleStayOnPatrolPoint = 3f, maxIdleStayOnPatrolPoint = 10f;
+    [Tooltip("Should the NPC stay in one place only?")]
     [SerializeField]
+    private bool isStationaryNPC = false;
+    [SerializeField]
+    [Tooltip("Instead of using the default way of picking a random navmesh point, the NPC will now use a custom waypoint system. Next waypoint is randomly chosen.")]
     private bool isUsingWaypoints = false;
+    [Tooltip("Waypoints will now be followed in a sequential pattern. When the last one is reached, the NPC will traverse them backwards.")]
+    [SerializeField]
+    private bool isWayPointSequential = false;
+    private int currentSequentialWaypoint = 0;
+    private bool isGoingBackSequential = false; //control if the NPC is currently traversing the waypoints backwards
     [SerializeField]
     private List<Transform> waypoints;
 
@@ -50,7 +59,34 @@ public class Enemy_Base : MonoBehaviour
         }
         else
         {
-            currentPatrolPoint = waypoints[Random.Range(0, waypoints.Count - 1)].position;
+            if(!isWayPointSequential) //pick a point randomly
+            {
+                currentPatrolPoint = waypoints[Random.Range(0, waypoints.Count - 1)].position;
+            }
+            else //traverse sequentially; control the current traverse direction
+            {
+                currentPatrolPoint = waypoints[currentSequentialWaypoint].position;
+
+                if(currentSequentialWaypoint >= waypoints.Count - 1) //if last one is reached
+                {
+                    isGoingBackSequential = true;
+                    Debug.Log("GOBACKTRUE");
+                }
+                else if(currentSequentialWaypoint <= 0) //if first one is reached
+                {
+                    isGoingBackSequential = false;
+                    Debug.Log("GOBACKFALSE");
+                }
+
+                if(!isGoingBackSequential)
+                {
+                    currentSequentialWaypoint++;
+                }
+                else
+                {
+                    currentSequentialWaypoint--;
+                }        
+            }      
         }
 
 
@@ -59,26 +95,29 @@ public class Enemy_Base : MonoBehaviour
 
     protected virtual void WanderAround(NavMeshAgent agent)
     {
-        if (currentPatrolPoint == Vector3.zero) //pick a new point
+        if (!isStationaryNPC)
         {
-            currentPatrolPoint = RandomPointInRange(origin, wanderZone);
-            idleStayOnPatrolPoint = Random.Range(minIdleStayOnPatrolPoint, maxIdleStayOnPatrolPoint);
-        }
-        else //go to the current point and control the animations
-        {
-            agent.SetDestination(currentPatrolPoint);
-            anim.SetBool("is_WalkForward", true);
-            anim.SetBool("is_Idle", false);
-            if (Vector3.Distance(currentPatrolPoint, transform.position) < 1f)
+            if (currentPatrolPoint == Vector3.zero) //pick a new point
             {
-                anim.SetBool("is_WalkForward", false);
-                anim.SetBool("is_Idle", true);
-                elapsedIdleStayOnPatrolPoint += Time.deltaTime;
-                if (elapsedIdleStayOnPatrolPoint >= idleStayOnPatrolPoint)
+                currentPatrolPoint = RandomPointInRange(origin, wanderZone);
+                idleStayOnPatrolPoint = Random.Range(minIdleStayOnPatrolPoint, maxIdleStayOnPatrolPoint);
+            }
+            else //go to the current point and control the animations
+            {
+                agent.SetDestination(currentPatrolPoint);
+                anim.SetBool("is_WalkForward", true);
+                anim.SetBool("is_Idle", false);
+                if (Vector3.Distance(currentPatrolPoint, transform.position) <= 1f)
                 {
-                    idleStayOnPatrolPoint = Random.Range(minIdleStayOnPatrolPoint, maxIdleStayOnPatrolPoint);
-                    currentPatrolPoint = RandomPointInRange(origin, wanderZone);
-                    elapsedIdleStayOnPatrolPoint = 0f;
+                    anim.SetBool("is_WalkForward", false);
+                    anim.SetBool("is_Idle", true);
+                    elapsedIdleStayOnPatrolPoint += Time.deltaTime;
+                    if (elapsedIdleStayOnPatrolPoint >= idleStayOnPatrolPoint)
+                    {
+                        idleStayOnPatrolPoint = Random.Range(minIdleStayOnPatrolPoint, maxIdleStayOnPatrolPoint);
+                        currentPatrolPoint = RandomPointInRange(origin, wanderZone);
+                        elapsedIdleStayOnPatrolPoint = 0f;
+                    }
                 }
             }
         }
@@ -87,5 +126,10 @@ public class Enemy_Base : MonoBehaviour
     protected void SetOrigin(Transform objectTransform)
     {
         origin = objectTransform.position;
+    }
+
+    public bool IsNPCStationary()
+    {
+        return isStationaryNPC;
     }
 }

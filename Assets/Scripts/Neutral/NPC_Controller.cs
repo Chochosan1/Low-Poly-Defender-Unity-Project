@@ -35,7 +35,7 @@ public class NPC_Controller : Enemy_Base
         Quaternion targetRotation = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
         transform.rotation = targetRotation;
 
-        if(greetAnimationTimestamp <= Time.time)
+        if(greetAnimationTimestamp <= Time.time && !IsNPCStationary())
         {
             anim.SetBool("is_Interacted", true);
 
