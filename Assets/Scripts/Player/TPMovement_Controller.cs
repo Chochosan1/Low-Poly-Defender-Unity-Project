@@ -83,7 +83,6 @@ public class TPMovement_Controller : MonoBehaviour
     public float attack3Radius = 2f;
     private float internalAttack1Cooldown, internalAttack2Cooldown, internalAttack3Cooldown;
     private float internalAttack1Timestamp, internalAttack2Timestamp, internalAttack3Timestamp;
-    public bool bowUnlocked = false;
     public float maxSwitchEquipmentDuration;
     private float elapsedSwitchedEquipmentDuration;
 
@@ -573,15 +572,6 @@ public class TPMovement_Controller : MonoBehaviour
         is_Grounded = true;
     }
 
-    public void UnlockBow()
-    {
-        bowUnlocked = true;
-        alertPanel.SetActive(true);
-        alertPanelText.text = "Bow unlocked!";
-        StartCoroutine(DisableGameObjectAfter(alertPanel, 3f));
-        Debug.Log("Reward acquired: bow");
-    }
-
     private IEnumerator DisableGameObjectAfter(GameObject objectToDisable, float disableAfterSeconds)
     {
         yield return new WaitForSeconds(disableAfterSeconds);
@@ -846,6 +836,16 @@ public class TPMovement_Controller : MonoBehaviour
     private void HandleToggleInventory(InputAction.CallbackContext context)
     {
         inventoryPanel.SetActive(!inventoryPanel.activeSelf);
+        if(inventoryPanel.activeSelf)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void HandleToggleQuestPanel(InputAction.CallbackContext context)
@@ -973,7 +973,7 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleEquipmentSwitch(InputAction.CallbackContext context)
     {
-        if(bowUnlocked)
+        if(Player_Inventory.instance.IsBowUnlocked())
         {
             elapsedSwitchedEquipmentDuration = 0f;
             movementState = MovementState.SwitchingEquipment;

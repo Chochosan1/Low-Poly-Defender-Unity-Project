@@ -33,7 +33,7 @@ public class DayNight_Manager : MonoBehaviour
     private Color32 nightSunColor;
     private Color32 ambientDayColor;
     private Color32 ambientNightColor;
-    private float fullNightSkyboxExposure = 0.9f;
+    private float fullNightSkyboxExposure = 0.55f;
     private float fullDaySkyboxExposure = 0.7f;
     [SerializeField]
     [Tooltip("How long it will take to swap between day and night.")]
@@ -55,7 +55,7 @@ public class DayNight_Manager : MonoBehaviour
         currentTimeState = CurrentTimeState.Day;
 
         daySunColor = new Color32(245, 241, 115, 255);
-        nightSunColor = new Color32(19, 45, 85, 255);
+        nightSunColor = new Color32(15, 15, 25, 255);
 
         ambientDayColor = new Color32(152, 152, 152, 255);
         ambientNightColor = new Color32(30, 30, 30, 255);
@@ -94,11 +94,11 @@ public class DayNight_Manager : MonoBehaviour
             }
             else
             {
-                daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), 0.2f, Time.deltaTime / cycleDuration * 3));
+                daySkybox.SetFloat("_Exposure", Mathf.Lerp(daySkybox.GetFloat("_Exposure"), 0.2f, Time.deltaTime / cycleDuration * 5));
                 daySkybox.SetFloat("_Rotation", daySkybox.GetFloat("_Rotation") + (Time.deltaTime * skyboxRotationSpeed));
             }
             //lerp from Day brightness to Night darkness
-            RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientNightColor, Time.deltaTime / cycleDuration);
+            RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientNightColor, Time.deltaTime / cycleDuration * 2);
             sunLight.color = Color.Lerp(sunLight.color, nightSunColor, Time.deltaTime / cycleDuration * 2);
             RenderSettings.reflectionIntensity = Mathf.Lerp(RenderSettings.reflectionIntensity, 0, Time.deltaTime / cycleDuration * 2);
           
@@ -114,7 +114,7 @@ public class DayNight_Manager : MonoBehaviour
                 sunLight.shadows = LightShadows.Hard;
                 isShadowsOn = false;
                 RenderSettings.skybox = nightSkybox;
-                nightSkybox.SetFloat("_Exposure", 1f);    
+                nightSkybox.SetFloat("_Exposure", 0.7f);    
             }
 
             
@@ -134,7 +134,7 @@ public class DayNight_Manager : MonoBehaviour
                 nightSkybox.SetFloat("_Rotation", nightSkybox.GetFloat("_Rotation") + (Time.deltaTime * skyboxRotationSpeed));
             }
             //lerp from Night darkness to Day brightness
-            RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientDayColor, Time.deltaTime / cycleDuration);
+            RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, ambientDayColor, Time.deltaTime / cycleDuration * 2);
             sunLight.color = Color.Lerp(sunLight.color, daySunColor, Time.deltaTime / cycleDuration * 2);
             RenderSettings.reflectionIntensity = Mathf.Lerp(RenderSettings.reflectionIntensity, 1, Time.deltaTime / cycleDuration * 2);
            
@@ -204,6 +204,7 @@ public class DayNight_Manager : MonoBehaviour
         SetCurrentTimeState(CurrentTimeState.Day);
         RenderSettings.reflectionIntensity = 1;
         sunLight.shadows = LightShadows.Soft;
+        RenderSettings.ambientLight = ambientDayColor;
         RenderSettings.skybox = daySkybox;
         daySkybox.SetFloat("_Exposure", fullDaySkyboxExposure);
         foreach (Light light in lightsList)
@@ -219,6 +220,7 @@ public class DayNight_Manager : MonoBehaviour
         RenderSettings.reflectionIntensity = 0;
         sunLight.shadows = LightShadows.Hard;
         RenderSettings.skybox = nightSkybox;
+        RenderSettings.ambientLight = ambientNightColor;
         nightSkybox.SetFloat("_Exposure", fullNightSkyboxExposure);
         foreach (Light light in lightsList)
         {

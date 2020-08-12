@@ -24,6 +24,7 @@ public class QuestComponent : MonoBehaviour
             new Quest("EnemyBow", 2, 0, 0, "Slay 2 enemy bowmen. [Khasto] can no longer watch his adorable puppies suffer everytime the bowmen practise their aim. ")
         };
 
+        quests[0].ShouldUnlockLightBoots = true;
         quests[1].ShouldUnlockBow = true;
     }
 
@@ -103,6 +104,7 @@ public class QuestComponent : MonoBehaviour
 
         //Quest rewards
         public bool ShouldUnlockBow { get; set; }
+        public bool ShouldUnlockLightBoots { get; set; }
         private int goldReward;
         private int skillPointsReward;
 
@@ -145,8 +147,12 @@ public class QuestComponent : MonoBehaviour
                 rewardsClaimed = true;
                 if (ShouldUnlockBow)
                 {
-                    Player_Location.instance.gameObject.GetComponent<TPMovement_Controller>().UnlockBow();
+                    Player_Inventory.instance.UnlockBow();
                     Debug.Log("Bow unlocked");
+                }
+                else if(ShouldUnlockLightBoots)
+                {
+                    Player_Inventory.instance.UnlockLightBoots();
                 }
                 Player_Inventory.instance.TotalGold += goldReward;
                 Player_Inventory.instance.TotalSkillPoints += skillPointsReward;

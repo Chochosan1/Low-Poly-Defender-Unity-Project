@@ -28,6 +28,16 @@ public class Player_Inventory : MonoBehaviour
         OnInventoryVariableChange -= UpdateRewardPanelText;
     }
 
+    private bool isBowUnlocked = false;
+
+    [Header("Light boots")]
+    public Material normalBootsMat;
+    public Material lightBootsMat;
+    private bool isLightBootsEquipped = false;
+    private bool isLightBootsUnlocked;
+    public GameObject boots;
+    public GameObject bootsLight;
+
     private void Start()
     {
         rewardPanelText = rewardAlertPanel.GetComponentInChildren<TextMeshProUGUI>();
@@ -73,8 +83,57 @@ public class Player_Inventory : MonoBehaviour
     public void UpdateRewardPanelText(string varName, int varValue)
     {
         rewardAlertPanel.SetActive(true);
-        rewardPanelText.text += "\n " + varName + " " + varValue; //add multiple rewards to the same string in case the player receives multiple rewards at once
+        if(varValue > 0)
+        {
+            rewardPanelText.text += "\n " + varName + " " + varValue; //add multiple rewards to the same string in case the player receives multiple rewards at once
+        }
+        else
+        {
+            rewardPanelText.text += "\n " + varName + " "; //add multiple rewards to the same string in case the player receives multiple rewards at once
+        }
+       
         StartCoroutine(DisableGameObjectAfter(rewardAlertPanel, 3, true));
+    }
+
+    public void EquipLightBoots()
+    {
+        if (!isLightBootsUnlocked)
+            return;
+
+        if(isLightBootsEquipped)
+        {
+            boots.GetComponent<Renderer>().material = normalBootsMat;
+            bootsLight.SetActive(false);
+            isLightBootsEquipped = false;
+        }
+        else
+        {
+            boots.GetComponent<Renderer>().material = lightBootsMat;
+            bootsLight.SetActive(true);
+            isLightBootsEquipped = true;
+        }
+    }
+
+    public void UnlockLightBoots()
+    {
+        isLightBootsUnlocked = true;
+        UpdateRewardPanelText("Light boots unlocked!", 0);
+    }
+
+    public void UnlockBow()
+    {
+        isBowUnlocked = true;
+        UpdateRewardPanelText("Bow unlocked!", 0);
+    }
+
+    public bool IsBowUnlocked()
+    {
+        return isBowUnlocked;
+    }
+
+    public bool IsLightBootsUnlocked()
+    {
+        return isLightBootsUnlocked;
     }
 
     private void UpdateDisplayTexts(string varName, int varValue)

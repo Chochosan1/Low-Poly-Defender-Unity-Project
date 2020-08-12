@@ -23,9 +23,8 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     public bool currentlyAggressive = true;
     [Tooltip("If the enemy takes damage from a far distance (more than his sense range), he will go to the last known area source from which he took damage in order to find his enemy.")]
     public bool checkAreaIfDamageTakenFromAfar = true;
-  //  public float minIdleStayOnPatrolPoint = 3f, maxIdleStayOnPatrolPoint = 10f;
-//    private float idleStayOnPatrolPoint = 3f;
-  //  private float elapsedIdleStayOnPatrolPoint;
+    public float rotationSpeed;
+    public float lookDirectionYoffset = 0.3f;
 
     [Header("Attack")]
     public LayerMask enemyLayer;
@@ -58,7 +57,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
-      //  rb = GetComponent<Rigidbody>();
+        //  rb = GetComponent<Rigidbody>();
         SetAttackCooldowns();
         currentHealth = maxHealth;
         damageReductionValue = armor * 0.5f / 100;
@@ -72,7 +71,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         GoToNoneState();
 
         //only bowmen can be set as static bowmen
-        if(is_StaticBowman)
+        if (is_StaticBowman)
         {
             is_Bowman = true;
         }
@@ -82,10 +81,10 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     {
         if (aiState == AIState.MovingToTarget)
         {
-            if(currentTarget != null)
+            if (currentTarget != null)
             {
                 ((IEnemyAI)this).GoToTarget(currentTarget.transform.position);
-            }        
+            }
             else
             {
                 GoToNoneState();
@@ -132,6 +131,8 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
             currentPatrolPoint = Vector3.zero;
             agent.stoppingDistance = originalStoppingDistance;
             elapsedAttackDuration += Time.deltaTime;
+
+            LookAtTarget();
 
             if (elapsedAttackDuration >= attack1MaxDuration && anim.GetBool("is_Attack1"))
             {
@@ -192,7 +193,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
             currentTarget = null;
             currentTargetAI = null;
 
-            if(currentHealth <= 0)
+            if (currentHealth <= 0)
             {
                 Die();
             }
@@ -221,11 +222,11 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         {
             ChooseNewTarget();
 
-            if(debugMode)
+            if (debugMode)
             {
                 Debug.Log(aiState);
             }
-          
+
             float distance = 10000;
             if (currentTarget != null)
             {
@@ -256,7 +257,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
                 }
             }
         }
-        else if(aiState != AIState.Dead && !is_Dead && is_StaticBowman && is_StaticBowmanActivated)
+        else if (aiState != AIState.Dead && !is_Dead && is_StaticBowman && is_StaticBowmanActivated)
         {
             AttackBow2();
         }
@@ -265,9 +266,9 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
 
     public override void TakeDamage(float damage, float sufferKnockbackPower, GameObject attacker)
     {
-        if(!is_Dead)
+        if (!is_Dead)
         {
-            if(currentTarget == null && checkAreaIfDamageTakenFromAfar)
+            if (currentTarget == null && checkAreaIfDamageTakenFromAfar)
             {
                 aiState = AIState.LookingForTarget;
                 lastKnownSpotOfTheEnemy = Player_Location.instance.transform.position;
@@ -283,12 +284,12 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
 
             if (currentHealth <= 0)
             {
-                if(attacker.CompareTag("Player"))
+                if (attacker.CompareTag("Player"))
                 {
                     attacker.GetComponent<QuestComponent>().CheckQuestProgressKill(this);
                 }
 
-                Die();           
+                Die();
             }
         }
     }
@@ -318,9 +319,23 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         agent.SetDestination(transform.position);
     }
 
+    //rotate target especially archers to look at the target so that they can shoot it even if on different ground level
+    private void LookAtTarget()
+    {
+        if(currentTarget != null && is_Bowman)
+        {
+            Vector3 lookVector = currentTarget.transform.position - transform.position;
+            lookVector.y += lookDirectionYoffset;
+
+            Quaternion rot = Quaternion.LookRotation(lookVector);
+
+            transform.rotation = rot;
+        }  
+    }
+
     public void Attack1()
     {
-    //    Debug.Log("ENEMY ATTACK");
+        //    Debug.Log("ENEMY ATTACK");
         RaycastHit hit;
 
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out hit, attackRange, enemyLayer))
@@ -372,19 +387,19 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
             if (hitColliders.Length > 0)
             {
                 currentTarget = hitColliders[0].gameObject;
-                if(currentTarget.CompareTag("AI"))
+                if (currentTarget.CompareTag("AI"))
                 {
                     currentTargetAI = currentTarget.GetComponent<EnemyAI_Controller>();
-                }              
+                }
             }
         }
     }
 
     private void SetTargetToNullIfTargetIsDead()
     {
-        if(currentTargetAI != null && currentTargetAI.aiState == AIState.Dead)
+        if (currentTargetAI != null && currentTargetAI.aiState == AIState.Dead)
         {
-          //  Debug.Log("TARGETS RESET");
+            //  Debug.Log("TARGETS RESET");
             currentTarget.layer = 0; //remove enemy from the enemyLayer so it does not get detected with raycasts
             currentTarget = null;
             currentTargetAI = null;
@@ -406,21 +421,22 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         internalAttack1Timestamp = Time.time + internalAttack1Cooldown;
         anim.SetBool("is_Attack1", true);
 
-        if(is_Bowman)
+        if (is_Bowman)
         {
             arrowVisual.SetActive(true);
         }
 
-        if(currentTarget != null)
+        if (currentTarget != null)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
-            transform.rotation = targetRotation;
-        }  
+            //  Quaternion targetRotation = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
+            //   transform.rotation = targetRotation;
+            LookAtTarget();
+        }
     }
 
     private void AttackBow2()
     {
-        if(is_Bowman)
+        if (is_Bowman)
         {
             arrowVisual.SetActive(true);
             anim.SetBool("is_Attack2", true);

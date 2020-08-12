@@ -9283,6 +9283,10 @@ MonoBehaviour:
   chaseSpeed: 3.5
   minIdleStayOnPatrolPoint: 3
   maxIdleStayOnPatrolPoint: 10
+  isStationaryNPC: 0
+  isUsingWaypoints: 0
+  isWayPointSequential: 0
+  waypoints: []
   debugMode: 0
   deathParticle: {fileID: 1280141305896002, guid: e473029e4c70ad543a6879b82a732f4f,
     type: 3}
@@ -9293,6 +9297,8 @@ MonoBehaviour:
   pureEnemySenseRange: 15
   currentlyAggressive: 1
   checkAreaIfDamageTakenFromAfar: 1
+  rotationSpeed: 0
+  lookDirectionYoffset: 0.15
   enemyLayer:
     serializedVersion: 2
     m_Bits: 512
