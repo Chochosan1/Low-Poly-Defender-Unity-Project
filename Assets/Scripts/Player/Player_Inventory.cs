@@ -114,16 +114,19 @@ public class Player_Inventory : MonoBehaviour
         }
     }
 
+    //called in QuestComponent.cs upon claiming a quest reward
     public void UnlockLightBoots()
     {
         isLightBootsUnlocked = true;
         UpdateRewardPanelText("Light boots unlocked!", 0);
+        Chochosan.UI_Chochosan.Instance.UI_UpdateTextsOnMagicUnlocked("Light boots");
     }
 
     public void UnlockBow()
     {
         isBowUnlocked = true;
         UpdateRewardPanelText("Bow unlocked!", 0);
+        Chochosan.UI_Chochosan.Instance.UI_UpdateTextsOnMagicUnlocked("Bow fire arrow");
     }
 
     public bool IsBowUnlocked()

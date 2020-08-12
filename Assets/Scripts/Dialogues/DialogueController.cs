@@ -34,6 +34,7 @@ public class DialogueController : MonoBehaviour, IInteractable
     public bool questGiver = false;
     [Tooltip("Specify the quest index that must be unlocked.")]
     public int questID;
+    public string questFinishedMessage;
 
     [Tooltip("Enable this if the interactable NPC should start the story if the player is close instead of pressing interact.")]
     public bool proximityMessagePop;
@@ -50,9 +51,9 @@ public class DialogueController : MonoBehaviour, IInteractable
         originalTypeWriteDelay = typeWriterDelay; //save the original delay  
 
         //necessary for the questGiver to tell his story before giving the quest
-        if(questGiver)
+        if (questGiver)
         {
-            storyMode = true; 
+            storyMode = true;
         }
     }
 
@@ -87,6 +88,11 @@ public class DialogueController : MonoBehaviour, IInteractable
                 if (Player_Location.instance.GetComponent<QuestComponent>().IsQuestComplete(questID))
                 {
                     Player_Location.instance.GetComponent<QuestComponent>().ClaimQuestRewards(questID);
+
+                    //swap the first message to the questFinishedMessage and use it in the TypeWriter
+                    messages[0] = questFinishedMessage;
+                    currMessageIndex = 0;
+                    StartCoroutine(TypeWriterEffect());
                 }
                 else
                 {
