@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 /// <summary>
-/// Controls the updating of the UI texts. Attached to the canvas component.
+/// Controls the updating of the UI texts. Attached to the canvas component. Singleton for easy access.
 /// </summary>
 namespace Chochosan
 {
@@ -18,6 +18,11 @@ namespace Chochosan
                 Instance = this;
             }
         }
+
+        //supports up to 10 quests at a time 
+        //if it holds 0 means its free; 1 means its occupied by a quest 
+        //free/occupied is dynamically changed during playtime
+        private int[] UI_FreeOccupiedQuestTextComponents = new int[10]; 
 
         [SerializeField]
         private List<TMPro.TextMeshProUGUI> lightBootsTexts; //buttonText; stateText; tooltipText;
@@ -45,6 +50,34 @@ namespace Chochosan
         public void TogglePanel(GameObject panel)
         {
             panel.SetActive(!panel.activeSelf);
+        }
+
+        //when a quest in QuestComponent.cs is assigne a quest text slot -> then mark it as occupied
+        public void SetQuestTextOccupied(int questTextID)
+        {
+            UI_FreeOccupiedQuestTextComponents[questTextID] = 1;
+        }
+
+        //free the quest text slot when the quest is completed
+        public void SetQuestTextFree(int questTextID)
+        {
+            UI_FreeOccupiedQuestTextComponents[questTextID] = 0;
+        }
+
+        //find the first non-occupied quest text slot and return it so that the quest calling it can use it
+        public int GetFirstFreeQuestText()
+        {
+            int firstFreeTextIndex = 0;
+            for(int i = 0; i < UI_FreeOccupiedQuestTextComponents.Length; i++)
+            {
+                if(UI_FreeOccupiedQuestTextComponents[i] != 1)
+                {
+                    firstFreeTextIndex = i;
+                    break;
+                }
+            }
+
+            return firstFreeTextIndex;
         }
     }
 }

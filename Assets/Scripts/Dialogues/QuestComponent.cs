@@ -11,7 +11,7 @@ public class QuestComponent : MonoBehaviour
 {
     private TPMovement_Controller playerController;
     private Player_Inventory playerInventory;
-    public Text[] text_Quests;
+    public TMPro.TextMeshProUGUI[] text_Quests;
 
     private List<Quest> quests;
 
@@ -30,10 +30,13 @@ public class QuestComponent : MonoBehaviour
 
     public void AcceptQuest(int questID, string questGiverName)
     {
-        quests[questID].AcceptQuest(questGiverName);
+        quests[questID].AcceptQuest(questGiverName); 
         playerController.SetQuestPanelState(true);
-        text_Quests[questID].gameObject.SetActive(true);
-        text_Quests[questID].text = quests[questID].questDescription;
+        int firstFreeQuest = Chochosan.UI_Chochosan.Instance.GetFirstFreeQuestText(); //find out the first free quest text out of the whole text array
+        quests[questID].SetCurrentQuestText(firstFreeQuest); //the current quest will use the first free quest text as its own
+        Chochosan.UI_Chochosan.Instance.SetQuestTextOccupied(firstFreeQuest); //mark this quest text as occupied so that other quests skip it
+        text_Quests[firstFreeQuest].gameObject.SetActive(true); //activate the text element
+        text_Quests[firstFreeQuest].text = quests[questID].questDescription; //change its text
         Debug.Log("ACCEPT QUEST CALLED");
     }
 
@@ -42,7 +45,8 @@ public class QuestComponent : MonoBehaviour
         if(!quests[questID].IsRewardsClaimed())
         {
             quests[questID].ClaimQuestRewards();
-            text_Quests[questID].gameObject.SetActive(false);
+            text_Quests[quests[questID].GetCurrentQuestText()].gameObject.SetActive(false); //turn off the text element the current quest is holding
+            Chochosan.UI_Chochosan.Instance.SetQuestTextFree(quests[questID].GetCurrentQuestText()); //set that text element to free so other quests can now use it
             Debug.Log("Rewards claimed.");
         }   
     }
@@ -67,7 +71,7 @@ public class QuestComponent : MonoBehaviour
                 //if quest is complete then do some stuff
                 if (tempQuest.IsQuestComplete())
                 {
-                    text_Quests[currQuest].text = $"Return to {tempQuest.GetQuestGiverName()} to claim your quest rewards."; //change the description of the quest
+                    text_Quests[tempQuest.GetCurrentQuestText()].text = $"Return to {tempQuest.GetQuestGiverName()} to claim your quest rewards."; //change the description of the quest
                 }
             }
             currQuest++;
@@ -100,6 +104,7 @@ public class QuestComponent : MonoBehaviour
         private bool questAccepted = false;
         private bool questComplete = false;
         private bool rewardsClaimed = false;
+        private int currentQuestTextIndex; //caches which quest text slot the quest is using; upon quest completion that quest text slot must be freed
 
 
         //Quest rewards
@@ -113,6 +118,16 @@ public class QuestComponent : MonoBehaviour
         {
             questAccepted = true;
             this.questGiverName = questGiverName;
+        }
+
+        public void SetCurrentQuestText(int questTextIndex)
+        {
+            currentQuestTextIndex = questTextIndex;
+        }
+
+        public int GetCurrentQuestText()
+        {
+            return currentQuestTextIndex;
         }
 
         public string GetQuestGiverName()

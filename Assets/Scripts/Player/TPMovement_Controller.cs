@@ -851,6 +851,16 @@ public class TPMovement_Controller : MonoBehaviour
     private void HandleToggleQuestPanel(InputAction.CallbackContext context)
     {
         questPanel.SetActive(!questPanel.activeSelf);
+        if (questPanel.activeSelf)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     private void HandleLockedOrbit(InputAction.CallbackContext context)
