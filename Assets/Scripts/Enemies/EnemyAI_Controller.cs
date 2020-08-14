@@ -289,6 +289,10 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
                 {
                     attacker.GetComponent<QuestComponent>().CheckQuestProgressKill(this);
                 }
+                else if(attacker.name.Contains("Fireball"))
+                {
+                    Screen_Shake.Instance.ShakeScreen(0.25f, 5);
+                }
 
                 Die();
             }

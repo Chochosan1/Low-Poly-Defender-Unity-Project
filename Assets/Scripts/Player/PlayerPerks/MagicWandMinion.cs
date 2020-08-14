@@ -35,16 +35,6 @@ public class MagicWandMinion : MonoBehaviour
     [SerializeField]
     private float enemyDetectionArea = 10f;
 
-    [Header("Movement")]  
-    [SerializeField]
-    private Vector3 pivotPointOffset;
-    private Vector3 centerPivot;
-    private float angle;
-    [SerializeField]
-    private float rotateSpeed;
-    [SerializeField]
-    private float radius;
-
     private void Awake()
     {
         if(Instance == null)
@@ -53,10 +43,6 @@ public class MagicWandMinion : MonoBehaviour
         }
     }
 
-    private void Start()
-    {
-        ChangeRotateAroundRadius();
-    }
 
     private void Update()
     {
@@ -67,18 +53,9 @@ public class MagicWandMinion : MonoBehaviour
             castTimestamp = Time.time + castCooldown;
             CastSpell();
         }
-
-        centerPivot = Player_Location.instance.transform.position + pivotPointOffset;
-        transform.RotateAround(centerPivot, Vector3.up, rotateSpeed * Time.deltaTime);
-        ChangeRotateAroundRadius();
     }
 
-    private void ChangeRotateAroundRadius()
-    {
-        var newPos = (transform.position - centerPivot).normalized * radius;
-        newPos += centerPivot;
-        transform.position = newPos;
-    }
+
 
     private void CastSpell()
     {
