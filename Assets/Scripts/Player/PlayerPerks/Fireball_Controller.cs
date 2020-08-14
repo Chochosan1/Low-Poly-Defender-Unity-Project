@@ -7,6 +7,9 @@ using UnityEngine;
 public class Fireball_Controller : MonoBehaviour
 {
     public SO_FireBall fireballStats;
+  
+
+
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -25,6 +28,12 @@ public class Fireball_Controller : MonoBehaviour
             }
         }
         Destroy(hitVFX, 1f);
-        Destroy(this.gameObject);
+        gameObject.SetActive(false); //don't destroy; only deactivate so it can be reused from the pool
+
+        //keep adding items to the pool if the limit is not yet reached
+        if(MagicWandMinion.Instance.stillSpawning)
+        {
+            MagicWandMinion.Instance.AddBallToPool(this.gameObject);
+        }     
     }
 }
