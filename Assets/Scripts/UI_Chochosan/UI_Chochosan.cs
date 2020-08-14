@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 /// <summary>
-/// Controls the updating of the UI texts. Attached to the canvas component. Singleton for easy access.
+/// Controls the updates of the UI. Attached to the canvas component. Singleton for easy access.
 /// </summary>
 namespace Chochosan
 {
@@ -18,6 +18,12 @@ namespace Chochosan
                 Instance = this;
             }
         }
+
+        public SO_Player_Stats playerStats;
+        [SerializeField]
+        private UnityEngine.UI.Slider healthBar;
+        [SerializeField]
+        private UnityEngine.UI.Slider rageBar;
 
         //supports up to 10 quests at a time 
         //if it holds 0 means its free; 1 means its occupied by a quest 
@@ -78,6 +84,35 @@ namespace Chochosan
             }
 
             return firstFreeTextIndex;
+        }
+
+        public void UpdateBarValues(string resourceName)
+        {
+            switch (resourceName)
+            {
+                case "Rage":
+                    rageBar.value = playerStats.currentRage;
+                    break;
+                case "Health":
+                    healthBar.value = playerStats.currentHealth;
+                    break;
+            }
+        }
+
+        public void SetInitialBarValues(string resourceName)
+        {
+            switch (resourceName)
+            {
+                case "Rage":
+                    rageBar.maxValue = playerStats.maxRage;
+                    rageBar.value = playerStats.currentRage;
+                    break;
+                case "Health":
+                    healthBar.maxValue = playerStats.maxHealth;
+                    healthBar.value = playerStats.currentHealth;
+                    break;
+            }
+           
         }
     }
 }

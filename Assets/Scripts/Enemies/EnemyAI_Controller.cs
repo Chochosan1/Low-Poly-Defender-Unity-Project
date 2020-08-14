@@ -322,14 +322,22 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     //rotate target especially archers to look at the target so that they can shoot it even if on different ground level
     private void LookAtTarget()
     {
-        if(currentTarget != null && is_Bowman)
+        if(currentTarget != null)
         {
-            Vector3 lookVector = currentTarget.transform.position - transform.position;
-            lookVector.y += lookDirectionYoffset;
-
-            Quaternion rot = Quaternion.LookRotation(lookVector);
-
-            transform.rotation = rot;
+            if (is_Bowman)
+            {
+                Vector3 lookVector = currentTarget.transform.position - transform.position;
+                lookVector.y += lookDirectionYoffset;
+                Quaternion rot = Quaternion.LookRotation(lookVector);
+                transform.rotation = rot;
+            }
+            else
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
+                targetRotation.x = transform.rotation.x;
+                targetRotation.z = transform.rotation.z;
+                transform.rotation = targetRotation;
+            }
         }  
     }
 
@@ -427,9 +435,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         }
 
         if (currentTarget != null)
-        {
-            //  Quaternion targetRotation = Quaternion.LookRotation(currentTarget.transform.position - transform.position);
-            //   transform.rotation = targetRotation;
+        {          
             LookAtTarget();
         }
     }

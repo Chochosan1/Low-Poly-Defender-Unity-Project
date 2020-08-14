@@ -30,10 +30,8 @@ public class TPMovement_Controller : MonoBehaviour
     public CinemachineFreeLook cineFreeLookVcam;
     public GameObject weapon1visual, weapon2visual, bowVisual, arrowVisual;
     public GameObject arrowToShootPrefab, arrowSpawnPoint, arrowFirePrefab;
-    public UnityEngine.UI.Slider rageBar;
+    public SO_Player_Stats playerStats; 
     public Animator rageBarAnim;
-    public GameObject alertPanel;
-    private TMPro.TextMeshProUGUI alertPanelText;
     public GameObject questPanel;
     public GameObject inventoryPanel;
     public GameObject interactableAlertText;
@@ -44,21 +42,7 @@ public class TPMovement_Controller : MonoBehaviour
     [HideInInspector]
     public Vector2 cursorHotSpot = Vector2.zero;
 
-    [Header("Stats")]
-    public float maxHealth;
-    private float currentHealth;
-    public float maxRage;
-    private float currentRage;
-    [Header("Movement")]
-    [Tooltip("The maximum angle the player is allowed to walk and jump on. On a flat ground the angle is 90. Going up a hill is > 90, going downhill is < 90.")]
-    public float maxAngle = 120f;
     private float groundAngle; //the calculated angle between the player and the direction he is moving to
-    public float walkSpeed;
-    public float sprintSpeed;
-    public float rotationSpeed;
-    public float jumpForce;
-    public float rollForwardForce = 50f;
-    public float rollCooldown = 4f;
     private float rollCooldownTimestamp;
     public float turnSmoothTime = 0.1f;
     [Tooltip("Roll animation and state will not last longer than this value after going into that state.")]
@@ -66,10 +50,7 @@ public class TPMovement_Controller : MonoBehaviour
     private float elapsedRollDuration;
     private float turnSmoothVelocity;
 
-    [Header("Attack")]
-    public float autoAttackDamage = 10f;
-    public float attackRange = 5f;
-    public float autoKnockbackPower = 10f;
+
     [Tooltip("Attack animation and state will not last longer than this value after going into that state.")]
     public float attack1MaxDuration = 0.75f;
     [Tooltip("How much forward should the player move while performing the attack?")]
@@ -137,15 +118,17 @@ public class TPMovement_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
-        alertPanelText = alertPanel.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+
+        playerStats.currentHealth = playerStats.maxHealth;
+        playerStats.currentRage = playerStats.maxRage;
+        Chochosan.UI_Chochosan.Instance.SetInitialBarValues("Rage");
+        Chochosan.UI_Chochosan.Instance.SetInitialBarValues("Health");
 
         Cursor.SetCursor(cursorTexture, cursorHotSpot, cursorMode);
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         ToggleFreeLook();
-        currentMoveSpeed = walkSpeed;
-        currentHealth = maxHealth;
-        rageBar.maxValue = maxRage;
+        currentMoveSpeed = playerStats.walkSpeed;   
         SetAttackCooldowns();
         is_Sprinting = false;
         movementState = MovementState.Idle;
@@ -460,60 +443,60 @@ public class TPMovement_Controller : MonoBehaviour
 
             if(is_LockedOrbit) //locked orbit movement
             {
-                if (movementState == MovementState.Forward && groundAngle < maxAngle)
+                if (movementState == MovementState.Forward && groundAngle < playerStats.maxAngle)
                 {
                     rb.AddForce(direction * currentMoveSpeed * (groundAngle / 100) * Time.deltaTime);
                 }
-                else if (movementState == MovementState.Left || movementState == MovementState.Right || movementState == MovementState.Backward && groundAngle < maxAngle) //side movement always at walk speed
+                else if (movementState == MovementState.Left || movementState == MovementState.Right || movementState == MovementState.Backward && groundAngle < playerStats.maxAngle) //side movement always at walk speed
                 {
-                    rb.AddForce(direction * walkSpeed * (groundAngle / 100) * Time.deltaTime);
+                    rb.AddForce(direction * playerStats.walkSpeed * (groundAngle / 100) * Time.deltaTime);
                 }
             }
             else //free orbit movement
             {
-                if (movementState == MovementState.Forward && groundAngle < maxAngle)
+                if (movementState == MovementState.Forward && groundAngle < playerStats.maxAngle)
                 {
                     rb.AddForce(direction * currentMoveSpeed * (groundAngle/100) * Time.deltaTime);
 
                     if(moveAxis.x < 0)
                     {
-                        Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                        Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                         Quaternion deltaRotation = Quaternion.Euler(-velocity * Time.deltaTime);
                         rb.MoveRotation(rb.rotation * deltaRotation);
                     }
                     else if(moveAxis.x > 0)
                     {
-                        Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                        Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                         Quaternion deltaRotation = Quaternion.Euler(velocity * Time.deltaTime);
                         rb.MoveRotation(rb.rotation * deltaRotation);
                     }
                 }
-                else if (movementState == MovementState.Backward && groundAngle < maxAngle)
+                else if (movementState == MovementState.Backward && groundAngle < playerStats.maxAngle)
                 {
-                    rb.AddForce(direction * walkSpeed * (groundAngle / 100) * Time.deltaTime);
+                    rb.AddForce(direction * playerStats.walkSpeed * (groundAngle / 100) * Time.deltaTime);
 
                     if (moveAxis.x < 0)
                     {
-                        Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                        Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                         Quaternion deltaRotation = Quaternion.Euler(velocity * Time.deltaTime);
                         rb.MoveRotation(rb.rotation * deltaRotation);
                     }
                     else if (moveAxis.x > 0)
                     {
-                        Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                        Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                         Quaternion deltaRotation = Quaternion.Euler(-velocity * Time.deltaTime);
                         rb.MoveRotation(rb.rotation * deltaRotation);
                     }
                 }
-                else if(movementState == MovementState.Left && groundAngle < maxAngle)
+                else if(movementState == MovementState.Left && groundAngle < playerStats.maxAngle)
                 {
-                    Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                    Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                     Quaternion deltaRotation = Quaternion.Euler(-velocity * Time.deltaTime);
                     rb.MoveRotation(rb.rotation * deltaRotation);
                 }
-                else if (movementState == MovementState.Right && groundAngle < maxAngle)
+                else if (movementState == MovementState.Right && groundAngle < playerStats.maxAngle)
                 {
-                    Vector3 velocity = new Vector3(0f, rotationSpeed, 0f);
+                    Vector3 velocity = new Vector3(0f, playerStats.rotationSpeed, 0f);
                     Quaternion deltaRotation = Quaternion.Euler(velocity * Time.deltaTime);
                     rb.MoveRotation(rb.rotation * deltaRotation);
                 }
@@ -559,7 +542,7 @@ public class TPMovement_Controller : MonoBehaviour
         //calculate the angle between the ground and the player; player should not be permitted to walk and jump on too steep hills
         groundAngle = Vector3.Angle(_groundCastResults[0].normal, direction);
         //Debug.Log("GROUND ANGLE: " + groundAngle);
-        if (groundAngle > maxAngle)
+        if (groundAngle > playerStats.maxAngle)
         {
             return;
         }
@@ -585,13 +568,13 @@ public class TPMovement_Controller : MonoBehaviour
             Instantiate(hitObjectParticle, particleSpawnPos, Quaternion.identity);
             Debug.Log("SHOULD SPAWN");
         }      
-        return autoAttackDamage * multiplier;
+        return playerStats.autoAttackDamage * multiplier;
     }
 
     public void Attack1()
     {
         // Does the ray intersect any objects in the specified layer
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out RaycastHit hit, attackRange, enemyLayer))
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out RaycastHit hit, playerStats.attackRange, enemyLayer))
         {
             if (hit.transform.CompareTag("Knockable"))
             {
@@ -608,7 +591,7 @@ public class TPMovement_Controller : MonoBehaviour
     public void Attack2()
     {
         // Does the ray intersect any objects in the specified layer
-        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out RaycastHit hit, attackRange, enemyLayer))
+        if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out RaycastHit hit, playerStats.attackRange, enemyLayer))
         {
             if (hit.transform.CompareTag("Knockable"))
             {
@@ -616,7 +599,7 @@ public class TPMovement_Controller : MonoBehaviour
             }
             else if (hit.transform.CompareTag("AI"))
             {
-                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), autoKnockbackPower, this.gameObject);
+                hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), playerStats.autoKnockbackPower, this.gameObject);
                 UpdateRageAndRageBar(GetAutoAttackDamage(1.1f, Vector3.zero, false));
             }
         }
@@ -625,7 +608,7 @@ public class TPMovement_Controller : MonoBehaviour
     public void Attack3()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position + new Vector3(0f, attackYoffset, 0f), attack3Radius, enemyLayer);
-        UpdateRageAndRageBar(-currentRage * 0.5f);
+        UpdateRageAndRageBar(-playerStats.currentRage * 0.5f);
         foreach (Collider hit in hitColliders)
         {
             if(hit.CompareTag("AI"))
@@ -675,8 +658,9 @@ public class TPMovement_Controller : MonoBehaviour
 
     public void TakeDamage(float damage, GameObject attacker)
     {
-        currentHealth -= damage;
-        if(currentHealth <= 0)
+        playerStats.currentHealth -= damage;
+        UpdateHealthBar();
+        if(playerStats.currentHealth <= 0)
         {
             Debug.Log("got ya");
         }
@@ -694,13 +678,13 @@ public class TPMovement_Controller : MonoBehaviour
     //called on roll animation event
     public void RollForward()
     {
-        rb.AddForce(transform.forward * rollForwardForce, ForceMode.Impulse);
+        rb.AddForce(transform.forward * playerStats.rollForwardForce, ForceMode.Impulse);
     }
 
     //called on roll animation event
     public void RollBackward()
     {
-        rb.AddForce(-transform.forward * rollForwardForce, ForceMode.Impulse);
+        rb.AddForce(-transform.forward * playerStats.rollForwardForce, ForceMode.Impulse);
     }
 
     //called at the end of certain animations /Roll, Attack, etc./
@@ -787,13 +771,18 @@ public class TPMovement_Controller : MonoBehaviour
 
     public void UpdateRageAndRageBar(float valueToAdd)
     {
-        currentRage = currentRage + valueToAdd > maxRage ? maxRage : currentRage + valueToAdd;
-        rageBar.value = currentRage;
+        playerStats.currentRage = playerStats.currentRage + valueToAdd > playerStats.maxRage ? playerStats.maxRage : playerStats.currentRage + valueToAdd;
+        Chochosan.UI_Chochosan.Instance.UpdateBarValues("Rage");
+    }
+
+    private void UpdateHealthBar()
+    {
+        Chochosan.UI_Chochosan.Instance.UpdateBarValues("Health");
     }
 
     private bool CheckIfEnoughRageForSpell(float rageRequirement)
     {
-        if(currentRage >= rageRequirement)
+        if(playerStats.currentRage >= rageRequirement)
         {
             return true;
         }
@@ -812,7 +801,7 @@ public class TPMovement_Controller : MonoBehaviour
     {
         is_Sprinting = !is_Sprinting;
 
-        currentMoveSpeed = is_Sprinting ? sprintSpeed : walkSpeed;
+        currentMoveSpeed = is_Sprinting ? playerStats.sprintSpeed : playerStats.walkSpeed;
     }
 
     private void HandleInteract(InputAction.CallbackContext context)
@@ -882,7 +871,7 @@ public class TPMovement_Controller : MonoBehaviour
         {
             GoToNoneState(); //reset all when jumping
             anim.SetBool("is_Jump", true);
-            rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+            rb.AddForce(transform.up * playerStats.jumpForce, ForceMode.Impulse);
         }
     }
 
@@ -958,7 +947,7 @@ public class TPMovement_Controller : MonoBehaviour
     {
         if (movementState != MovementState.Attack && movementState != MovementState.Roll && movementState != MovementState.SwitchingEquipment && rollCooldownTimestamp <= Time.time)
         {
-            rollCooldownTimestamp = Time.time + rollCooldown;
+            rollCooldownTimestamp = Time.time + playerStats.rollCooldown;
             elapsedRollDuration = 0f;
             movementState = MovementState.Roll;
             anim.SetBool("is_RollForward", true);
@@ -969,7 +958,7 @@ public class TPMovement_Controller : MonoBehaviour
     {
         if (movementState != MovementState.Attack && movementState != MovementState.Roll && movementState != MovementState.SwitchingEquipment && rollCooldownTimestamp <= Time.time)
         {
-            rollCooldownTimestamp = Time.time + rollCooldown;
+            rollCooldownTimestamp = Time.time + playerStats.rollCooldown;
             elapsedRollDuration = 0f;
             movementState = MovementState.Roll;
             anim.SetBool("is_RollBackward", true);
