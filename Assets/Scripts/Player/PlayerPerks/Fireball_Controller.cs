@@ -8,9 +8,6 @@ public class Fireball_Controller : MonoBehaviour
 {
     public SO_FireBall fireballStats;
   
-
-
-
     private void OnCollisionEnter(Collision collision)
     {
         ExplodeAndDealDamage();
@@ -24,7 +21,7 @@ public class Fireball_Controller : MonoBehaviour
         {
             if (hitCol.gameObject.CompareTag("AI"))
             {
-                hitCol.gameObject.GetComponent<EnemyAI_Controller>().TakeDamage(fireballStats.damage, 0, this.gameObject);
+                hitCol.gameObject.GetComponent<EnemyAI_Controller>().TakeDamage(fireballStats.damage, fireballStats.knockBackPower, this.gameObject);
             }
         }
         Destroy(hitVFX, 1f);

@@ -10,11 +10,14 @@ public class MagicWandMinion : MonoBehaviour
 
     [SerializeField]
     private GameObject projectilePrefab;
+
+    //pooling
     [SerializeField]
     [Tooltip("The size of the object pool. Make sure it is big enough so that it can support even a fast attack rate. The pool will get filled during runtime, when this limit is reached items from the pool will be reused.")]
     private int projectilePoolSize = 15;
     [HideInInspector]
     public List<GameObject> fireballPool;
+    [HideInInspector]
     public bool stillSpawning = true;
     private int currentPoolItem = 0; //used to iterate through the pool of items
 
@@ -23,14 +26,24 @@ public class MagicWandMinion : MonoBehaviour
     private float castTimestamp;
 
     [SerializeField]
-    private float force;
+    private float force = 3f;
     private GameObject currentTarget;
     private EnemyAI_Controller currentTargetAI;
 
     [SerializeField]
     private LayerMask enemyLayer;
     [SerializeField]
-    private float enemyDetectionArea;
+    private float enemyDetectionArea = 10f;
+
+    [Header("Movement")]  
+    [SerializeField]
+    private Vector3 pivotPointOffset;
+    private Vector3 centerPivot;
+    private float angle;
+    [SerializeField]
+    private float rotateSpeed;
+    [SerializeField]
+    private float radius;
 
     private void Awake()
     {
@@ -38,6 +51,11 @@ public class MagicWandMinion : MonoBehaviour
         {
             Instance = this;
         }
+    }
+
+    private void Start()
+    {
+        ChangeRotateAroundRadius();
     }
 
     private void Update()
@@ -49,6 +67,17 @@ public class MagicWandMinion : MonoBehaviour
             castTimestamp = Time.time + castCooldown;
             CastSpell();
         }
+
+        centerPivot = Player_Location.instance.transform.position + pivotPointOffset;
+        transform.RotateAround(centerPivot, Vector3.up, rotateSpeed * Time.deltaTime);
+        ChangeRotateAroundRadius();
+    }
+
+    private void ChangeRotateAroundRadius()
+    {
+        var newPos = (transform.position - centerPivot).normalized * radius;
+        newPos += centerPivot;
+        transform.position = newPos;
     }
 
     private void CastSpell()
@@ -63,7 +92,7 @@ public class MagicWandMinion : MonoBehaviour
             }
             else //when full start using items from the pool
             {
-                Debug.Log("I COME FROM THE POOL");
+               // Debug.Log("I COME FROM THE POOL");
                 Rigidbody tempRb = fireballPool[currentPoolItem].GetComponent<Rigidbody>();
                 tempRb.velocity = new Vector3(0, 0, 0);
                 fireballPool[currentPoolItem].transform.position = transform.position + offsetVector;
@@ -74,7 +103,7 @@ public class MagicWandMinion : MonoBehaviour
                 if(currentPoolItem >= fireballPool.Count)
                 {
                     currentPoolItem = 0;
-                    Debug.Log("MAX OBJECT REACHED, STARTING FROM THE START");
+                 //   Debug.Log("MAX OBJECT REACHED, STARTING FROM THE START");
                 }
             }                
         }   
@@ -116,7 +145,7 @@ public class MagicWandMinion : MonoBehaviour
         if(fireballPool.Count >= projectilePoolSize)
         {
             stillSpawning = false;
-            Debug.Log("DISABLING INSTANTIATION!");
+         //   Debug.Log("DISABLING INSTANTIATION!");
         }
     }
 }

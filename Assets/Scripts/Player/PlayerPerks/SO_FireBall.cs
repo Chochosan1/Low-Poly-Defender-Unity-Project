@@ -10,6 +10,7 @@ public class SO_FireBall : ScriptableObject
     public float damage;
     public float areaOfEffect;
     public LayerMask enemyLayer;
+    public float knockBackPower;
 
     public GameObject muzzleParticle;
     public GameObject hitParticle;

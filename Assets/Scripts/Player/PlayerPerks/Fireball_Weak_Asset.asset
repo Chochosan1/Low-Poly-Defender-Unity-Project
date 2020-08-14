@@ -17,6 +17,7 @@ MonoBehaviour:
   enemyLayer:
     serializedVersion: 2
     m_Bits: 256
-  muzzleParticle: {fileID: 0}
+  muzzleParticle: {fileID: 1486444696406430, guid: 0dfaf73d94d73f846971c04d480a35d1,
+    type: 3}
   hitParticle: {fileID: 1221116321114522, guid: 8d396b473b5012b4c95d4d42b54793f2,
     type: 3}
