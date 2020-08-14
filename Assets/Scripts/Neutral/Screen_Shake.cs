@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
-
+/// <summary>
+/// Attached to the cinemachine camera. Uses the amplitude gaine in the noise section to shake the camera. Must be prepared by hand beforehand.
+///(in order to set the addition options in the camera rigs and to enable the noise)
+/// </summary>
 public class Screen_Shake : MonoBehaviour
 {
     public static Screen_Shake Instance;
@@ -32,7 +35,6 @@ public class Screen_Shake : MonoBehaviour
         if (!is_CurrentlyShaking)
         {
             StartCoroutine(Shake(duration, magnitude));
-            Debug.Log("SHOULD SCREN SHAKE");
         }
     }
 

@@ -23,6 +23,8 @@ public class MagicWandMinion : MonoBehaviour
 
     [SerializeField]
     private float castCooldown;
+    [SerializeField]
+    Vector3 offsetVector;
     private float castTimestamp;
 
     [SerializeField]
@@ -61,7 +63,7 @@ public class MagicWandMinion : MonoBehaviour
     {
         if(currentTarget != null)
         {
-            Vector3 offsetVector = new Vector3(0, 0.15f, 0);
+           
             if(stillSpawning) //if the pool is still not full
             {
                 GameObject projectileCopy = Instantiate(projectilePrefab, transform.position + offsetVector, projectilePrefab.transform.rotation);
