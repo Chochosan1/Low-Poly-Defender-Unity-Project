@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-enum AIState { None, Idle, Patrol, MovingToTarget, Attack, LookingForTarget, Dead }
+public enum AIState { None, Idle, Patrol, MovingToTarget, Attack, LookingForTarget, Dead }
 
 [RequireComponent(typeof(Animator))]
 //[RequireComponent(typeof(Rigidbody))]
@@ -48,7 +48,8 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     private GameObject currentTarget;
     private EnemyAI_Controller currentTargetAI;
     private NavMeshAgent agent;
-    private AIState aiState;
+    [HideInInspector]
+    public AIState aiState;
     private Vector3 direction;
     private Vector3 lastKnownSpotOfTheEnemy; //if the enemy takes damage from far away, this is the position he is going towards in order to check for enemies
     private float originalStoppingDistance;

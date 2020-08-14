@@ -111,8 +111,7 @@ namespace Chochosan
                     healthBar.maxValue = playerStats.maxHealth;
                     healthBar.value = playerStats.currentHealth;
                     break;
-            }
-           
+            }  
         }
     }
 }

@@ -169,4 +169,9 @@ public class ProjectileMoveScript : MonoBehaviour {
         target = trg;
         rotateToMouse = rotateTo;
     }
+
+    public void SetTarget(GameObject trg)
+    {
+        target = trg;
+    }
 }
