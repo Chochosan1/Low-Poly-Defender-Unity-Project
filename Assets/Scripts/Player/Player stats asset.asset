@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b46293f83d37f8478bde7d30def2528, type: 3}
   m_Name: Player stats asset
   m_EditorClassIdentifier: 
-  maxHealth: 10000
-  currentHealth: -800
-  maxRage: 200
-  currentRage: 200
+  maxHealth: 1750
+  currentHealth: 550
+  maxRage: 180
+  currentRage: 11.25
   autoAttackDamage: 2000
   attackRange: 5
   autoKnockbackPower: 10

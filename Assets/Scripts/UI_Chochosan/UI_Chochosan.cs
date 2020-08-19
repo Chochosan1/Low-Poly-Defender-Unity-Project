@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 /// <summary>
 /// Controls the updates of the UI. Attached to the canvas component. Singleton for easy access.
@@ -21,9 +22,19 @@ namespace Chochosan
 
         public SO_Player_Stats playerStats;
         [SerializeField]
-        private UnityEngine.UI.Slider healthBar;
+        private Slider healthBar;
         [SerializeField]
-        private UnityEngine.UI.Slider rageBar;
+        private Slider rageBar;
+        [SerializeField]
+        private TextMeshProUGUI maxHealthValueText;
+        [SerializeField]
+        private TextMeshProUGUI currentHealthValueText;
+        [SerializeField]
+        private TextMeshProUGUI maxRageValueText;
+        [SerializeField]
+        private TextMeshProUGUI currentRageValueText;
+        [SerializeField]
+        private TextMeshProUGUI autoAttackValueText;
 
         //supports up to 10 quests at a time 
         //if it holds 0 means its free; 1 means its occupied by a quest 
@@ -34,6 +45,12 @@ namespace Chochosan
         private List<TMPro.TextMeshProUGUI> lightBootsTexts; //buttonText; stateText; tooltipText;
         [SerializeField]
         private List<TMPro.TextMeshProUGUI> bowTexts; //buttonText; stateText; tooltipText;
+
+
+        private void Start()
+        {
+            UpdateStatsValues();
+        }
 
         //used in Player_Inventory.cs upon unlocking something new
         public void UI_UpdateTextsOnMagicUnlocked(string UI_PartToUpdate)
@@ -86,19 +103,23 @@ namespace Chochosan
             return firstFreeTextIndex;
         }
 
-        public void UpdateBarValues(string resourceName)
+        public void UpdateBarAndTextValues(string resourceName)
         {
             switch (resourceName)
             {
                 case "Rage":
                     rageBar.value = playerStats.currentRage;
+                    currentRageValueText.text = playerStats.currentRage.ToString();
                     break;
                 case "Health":
                     healthBar.value = playerStats.currentHealth;
+                    currentHealthValueText.text = playerStats.currentHealth.ToString();
                     break;
             }
         }
 
+
+        //TPMovement_Controller calls this
         public void SetInitialBarValues(string resourceName)
         {
             switch (resourceName)
@@ -112,6 +133,15 @@ namespace Chochosan
                     healthBar.value = playerStats.currentHealth;
                     break;
             }  
+        }
+
+        public void UpdateStatsValues()
+        {
+            maxHealthValueText.text = playerStats.maxHealth.ToString();
+            currentHealthValueText.text = playerStats.currentHealth.ToString();
+            maxRageValueText.text = playerStats.maxRage.ToString();
+            currentRageValueText.text = playerStats.currentRage.ToString();
+            autoAttackValueText.text = playerStats.autoAttackDamage.ToString();
         }
     }
 }

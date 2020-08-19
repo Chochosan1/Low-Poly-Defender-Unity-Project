@@ -22,6 +22,8 @@ public class MagicWandMinion : MonoBehaviour
     private int currentPoolItem = 0; //used to iterate through the pool of items
 
     [SerializeField]
+    private float ragePerShotCost;
+    [SerializeField]
     private float castCooldown;
     [SerializeField]
     Vector3 offsetVector;
@@ -61,9 +63,9 @@ public class MagicWandMinion : MonoBehaviour
 
     private void CastSpell()
     {
-        if(currentTarget != null)
+        if(currentTarget != null && TPMovement_Controller.instance.CheckIfEnoughRageForSpell(ragePerShotCost, false))
         {
-           
+            TPMovement_Controller.instance.UpdateRageAndRageBar(-ragePerShotCost);
             if(stillSpawning) //if the pool is still not full
             {
                 GameObject projectileCopy = Instantiate(projectilePrefab, transform.position + offsetVector, projectilePrefab.transform.rotation);

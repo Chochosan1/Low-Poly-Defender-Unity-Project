@@ -102,6 +102,10 @@ public class TPMovement_Controller : MonoBehaviour
 
     private readonly RaycastHit[] _groundCastResults = new RaycastHit[8]; //raycasts for checking if grounded
 
+    //Events
+    public delegate void OnHeroTakeDamageDelegate(string resourceToUpdate);
+    public event OnHeroTakeDamageDelegate OnHeroTakeDamage;
+      
     #region InitialSetup
     void Awake()
     {
@@ -170,6 +174,8 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.Enable();
         controls.MainControls.ToggleQuestPanel.Enable();
         controls.MainControls.ToggleInventoryPanel.Enable();
+
+      //  OnHeroTakeDamage += Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues;
     }
 
     private void OnDisable()
@@ -208,6 +214,9 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.Disable();
         controls.MainControls.ToggleQuestPanel.Disable();
         controls.MainControls.ToggleInventoryPanel.Disable();
+
+
+     //   OnHeroTakeDamage -= Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues;
     }
     #endregion
 
@@ -566,7 +575,7 @@ public class TPMovement_Controller : MonoBehaviour
         if(spawnParticle)
         {
             Instantiate(hitObjectParticle, particleSpawnPos, Quaternion.identity);
-            Debug.Log("SHOULD SPAWN");
+        //    Debug.Log("SHOULD SPAWN");
         }      
         return playerStats.autoAttackDamage * multiplier;
     }
@@ -659,8 +668,11 @@ public class TPMovement_Controller : MonoBehaviour
     public void TakeDamage(float damage, GameObject attacker)
     {
         playerStats.currentHealth -= damage;
+        //   OnHeroTakeDamage?.Invoke("Health");
+        //if (OnHeroTakeDamage != null)
+        //    OnHeroTakeDamage("Health");//invoke the delegate
         UpdateHealthBar();
-        if(playerStats.currentHealth <= 0)
+        if (playerStats.currentHealth <= 0)
         {
             Debug.Log("got ya");
         }
@@ -772,21 +784,24 @@ public class TPMovement_Controller : MonoBehaviour
     public void UpdateRageAndRageBar(float valueToAdd)
     {
         playerStats.currentRage = playerStats.currentRage + valueToAdd > playerStats.maxRage ? playerStats.maxRage : playerStats.currentRage + valueToAdd;
-        Chochosan.UI_Chochosan.Instance.UpdateBarValues("Rage");
+        Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues("Rage");
     }
 
     private void UpdateHealthBar()
     {
-        Chochosan.UI_Chochosan.Instance.UpdateBarValues("Health");
+        Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues("Health");
     }
 
-    private bool CheckIfEnoughRageForSpell(float rageRequirement)
+    public bool CheckIfEnoughRageForSpell(float rageRequirement, bool displayBarFeedback)
     {
         if(playerStats.currentRage >= rageRequirement)
         {
             return true;
         }
-        rageBarAnim.SetBool("notEnoughRage", true);
+        if(displayBarFeedback)
+        {
+            rageBarAnim.SetBool("notEnoughRage", true);
+        }      
         return false;
     }
    
@@ -903,7 +918,7 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleAttack2(InputAction.CallbackContext context)
     {     
-        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack2Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack2RageRequirement))
+        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack2Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack2RageRequirement, true))
         {
             ResetAllElapsedAttackDurations();
             internalAttack2Timestamp = internalAttack2Cooldown + Time.time;
@@ -928,7 +943,7 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleAttack3(InputAction.CallbackContext context)
     {
-        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack3Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack3RageRequirement))
+        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack3Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack3RageRequirement, true))
         {
             ResetAllElapsedAttackDurations();
             internalAttack3Timestamp = internalAttack3Cooldown + Time.time;

@@ -70,12 +70,12 @@ public class Enemy_Base : MonoBehaviour
                 if(currentSequentialWaypoint >= waypoints.Count - 1) //if last one is reached
                 {
                     isGoingBackSequential = true;
-                    Debug.Log("GOBACKTRUE");
+                 //   Debug.Log("GOBACKTRUE");
                 }
                 else if(currentSequentialWaypoint <= 0) //if first one is reached
                 {
                     isGoingBackSequential = false;
-                    Debug.Log("GOBACKFALSE");
+                //    Debug.Log("GOBACKFALSE");
                 }
 
                 if(!isGoingBackSequential)

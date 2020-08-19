@@ -36,13 +36,15 @@ public class DayNight_Manager : MonoBehaviour
     private float fullNightSkyboxExposure = 0.55f;
     private float fullDaySkyboxExposure = 0.7f;
     [SerializeField]
-    [Tooltip("How long it will take to swap between day and night.")]
-    private float cycleDuration = 5f;
+    [Tooltip("How long it will take to transition from day to night and vice versa.")]
+    private float cycleDuration = 20f;
+ //   [SerializeField]
+ //   [Range(0, 1)]
+  //  [Tooltip("After switching to another time state (day/night), the cycle will pause for a certain duration (in order to keep the game longer in the darkest/brightest state). It is a percentage based on the cycle duration time.")]
+ //   private float cyclePauseMultiplier = 0.2f;
     [SerializeField]
-    [Range(0, 1)]
-    [Tooltip("After switching to another time state (day/night), the cycle will pause for a certain duration (in order to keep the game longer in the darkest/brightest state). It is a percentage based on the cycle duration time.")]
-    private float cyclePauseMultiplier = 0.2f;
-    private float cyclePauseDuration; //the final result after applying the pauseMultiplier to the duration
+    [Tooltip("How long should each day/night last.")]
+    private float cyclePauseDuration = 300f; //the final result after applying the pauseMultiplier to the duration
     private bool isCurrentlyPaused;
     private bool isLightsOn;
     private bool isShadowsOn;
@@ -60,9 +62,11 @@ public class DayNight_Manager : MonoBehaviour
         ambientDayColor = new Color32(152, 152, 152, 255);
         ambientNightColor = new Color32(30, 30, 30, 255);
 
-        cyclePauseDuration = cycleDuration * cyclePauseMultiplier;
+      //  cyclePauseDuration = cycleDuration * cyclePauseMultiplier;
         Debug.Log("Pause is " + cyclePauseDuration);
         isCurrentlyPaused = false;
+
+        StartCoroutine(PauseAndResumeCycleAfter(cyclePauseDuration));
     }
 
     private void Update()
@@ -76,6 +80,10 @@ public class DayNight_Manager : MonoBehaviour
             if(currentTimeState == CurrentTimeState.Night)
             {
                 nightSkybox.SetFloat("_Rotation", nightSkybox.GetFloat("_Rotation") + (Time.deltaTime * skyboxRotationSpeed));
+            }
+            else if(currentTimeState == CurrentTimeState.Day)
+            {
+                daySkybox.SetFloat("_Rotation", daySkybox.GetFloat("_Rotation") + (Time.deltaTime * skyboxRotationSpeed));
             }
             return;
         }
@@ -156,9 +164,7 @@ public class DayNight_Manager : MonoBehaviour
             {
                 isShadowsOn = true;
                 sunLight.shadows = LightShadows.Soft;
-            }
-
-           
+            }       
         }
         else
         {      
