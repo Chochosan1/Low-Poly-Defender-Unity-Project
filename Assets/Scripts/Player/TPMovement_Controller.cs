@@ -57,12 +57,15 @@ public class TPMovement_Controller : MonoBehaviour
     public float attack1ForwardLungeForce = 25f;
     [Tooltip("Attack animation and state will not last longer than this value after going into that state.")]
     public float attack2MaxDuration = 0.8f;
-    public float attack2RageRequirement = 350f;
+  //  public float attack2RageRequirement = 350f;
     [Tooltip("Attack animation and state will not last longer than this value after going into that state.")]
     public float attack3MaxDuration = 0.8f;
-    public float attack3RageRequirement = 750f;
+    private float attack3CooldownTimestamp;
+   // public float attack3RageRequirement = 750f;
     public float attack3Radius = 2f;
-    private float internalAttack1Cooldown, internalAttack2Cooldown, internalAttack3Cooldown;
+
+    //these are used to set an absolute minimum cooldown indepenent of other spell cooldowns that may exist in order to avoid animation glitches and other bugs
+    private float internalAttack1Cooldown, internalAttack2Cooldown, internalAttack3Cooldown; 
     private float internalAttack1Timestamp, internalAttack2Timestamp, internalAttack3Timestamp;
     public float maxSwitchEquipmentDuration;
     private float elapsedSwitchedEquipmentDuration;
@@ -596,13 +599,15 @@ public class TPMovement_Controller : MonoBehaviour
             else if (hit.transform.CompareTag("AI"))
             {
                 hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(0.65f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0, this.gameObject);
-                UpdateRageAndRageBar(GetAutoAttackDamage(0.65f, Vector3.zero, false));
+                //  UpdateRageAndRageBar(GetAutoAttackDamage(0.65f, Vector3.zero, false));
+                UpdateRageAndRageBar(playerStats.attack1RageCharge);
             }
         }
     }
 
     public void Attack2()
     {
+        UpdateRageAndRageBar(-playerStats.attack2RageRequirement);
         // Does the ray intersect any objects in the specified layer
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward + new Vector3(0f, attackYoffset, 0f)), out RaycastHit hit, playerStats.attackRange, enemyLayer))
         {
@@ -613,7 +618,8 @@ public class TPMovement_Controller : MonoBehaviour
             else if (hit.transform.CompareTag("AI"))
             {
                 hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), playerStats.autoKnockbackPower, this.gameObject);
-                UpdateRageAndRageBar(GetAutoAttackDamage(1.1f, Vector3.zero, false));
+                //   UpdateRageAndRageBar(GetAutoAttackDamage(1.1f, Vector3.zero, false));
+                
             }
         }
     }
@@ -621,12 +627,14 @@ public class TPMovement_Controller : MonoBehaviour
     public void Attack3()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position + new Vector3(0f, attackYoffset, 0f), attack3Radius, enemyLayer);
-        UpdateRageAndRageBar(-playerStats.currentRage * 0.5f);
+        //  UpdateRageAndRageBar(-playerStats.currentRage * 0.5f);
+        //   UpdateRageAndRageBar(-playerStats.attack3RageRequirement);
+        Chochosan.UI_Chochosan_Spells.Instance.DisplayCooldown("Attack3", playerStats.attack3Cooldown);
         foreach (Collider hit in hitColliders)
         {
             if(hit.CompareTag("AI"))
             {
-                hit.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(0.5f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0f, this.gameObject);             
+                hit.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0f, this.gameObject);             
             }
         }
     }
@@ -898,6 +906,7 @@ public class TPMovement_Controller : MonoBehaviour
     {      
         if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack1Timestamp <= Time.time && !is_SwitchedToBow)
         {
+            Chochosan.UI_Chochosan_Spells.Instance.TriggerFeedback_AbilityUsed("Attack1");
             rb.AddForce(transform.forward * attack1ForwardLungeForce, ForceMode.Impulse);
             ResetAllElapsedAttackDurations();
             internalAttack1Timestamp = internalAttack1Cooldown + Time.time;
@@ -907,6 +916,7 @@ public class TPMovement_Controller : MonoBehaviour
         }   
         else if(movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack1Timestamp <= Time.time && is_SwitchedToBow)
         {
+            Chochosan.UI_Chochosan_Spells.Instance.TriggerFeedback_AbilityUsed("Attack1");
             ResetAllElapsedAttackDurations();
             internalAttack1Timestamp = internalAttack1Cooldown + Time.time;
 
@@ -922,8 +932,9 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleAttack2(InputAction.CallbackContext context)
     {     
-        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack2Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack2RageRequirement, true))
+        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack2Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(playerStats.attack2RageRequirement, true))
         {
+            Chochosan.UI_Chochosan_Spells.Instance.TriggerFeedback_AbilityUsed("Attack2");
             ResetAllElapsedAttackDurations();
             internalAttack2Timestamp = internalAttack2Cooldown + Time.time;
             
@@ -932,6 +943,7 @@ public class TPMovement_Controller : MonoBehaviour
         }    
         else if(movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack2Timestamp <= Time.time && is_SwitchedToBow)
         {
+            Chochosan.UI_Chochosan_Spells.Instance.TriggerFeedback_AbilityUsed("Attack2");
             ResetAllElapsedAttackDurations();
             internalAttack2Timestamp = internalAttack2Cooldown + Time.time;
 
@@ -947,10 +959,11 @@ public class TPMovement_Controller : MonoBehaviour
 
     private void HandleAttack3(InputAction.CallbackContext context)
     {
-        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack3Timestamp <= Time.time && !is_SwitchedToBow && CheckIfEnoughRageForSpell(attack3RageRequirement, true))
+        if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack3Timestamp <= Time.time && attack3CooldownTimestamp <= Time.time && !is_SwitchedToBow /*&& CheckIfEnoughRageForSpell(playerStats.attack3RageRequirement, true)*/)
         {
             ResetAllElapsedAttackDurations();
             internalAttack3Timestamp = internalAttack3Cooldown + Time.time;
+            attack3CooldownTimestamp = playerStats.attack3Cooldown + Time.time;
 
             movementState = MovementState.Attack;
             anim.SetBool("is_Attack3", true);

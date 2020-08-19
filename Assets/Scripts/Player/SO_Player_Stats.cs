@@ -19,6 +19,13 @@ public class SO_Player_Stats : ScriptableObject
     public float attackRange = 5f;
     public float autoKnockbackPower = 10f;
 
+    [Header("Attack rage specifics")]
+    [Tooltip("The first attack will give this much rage per hit enemy. Every swing of the attack (in total 2) give rage per hit.")]
+    public float attack1RageCharge = 25f;
+    public float attack2RageRequirement = 50f;
+   // public float attack3RageRequirement = 125f;
+    public float attack3Cooldown = 10f;
+
     [Header("Movement")]
     [Tooltip("The maximum angle the player is allowed to walk and jump on. On a flat ground the angle is 90. Going up a hill is > 90, going downhill is < 90.")]
     public float maxAngle = 120f;
