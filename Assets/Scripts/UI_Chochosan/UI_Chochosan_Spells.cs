@@ -71,7 +71,7 @@ namespace Chochosan
                     rollCoolingDown = false;
                     rollCooldownText.gameObject.SetActive(false);
                     rollCooldownImage.gameObject.SetActive(false);
-                    rollAnim.SetBool("TriggerFeedback", true);
+                    rollAnim.SetBool("TriggerFeedback_CooldownDone", true);
                 }
             }
 
