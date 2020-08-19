@@ -223,6 +223,10 @@ public class TPMovement_Controller : MonoBehaviour
     #region Updates
     private void Update()
     {
+        if(Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            Player_Inventory.instance.UnlockAllCheat();
+        }
         if (Time.unscaledTime > fpsTimestamp)
         {
             int fps = (int)(1f / Time.unscaledDeltaTime);
@@ -966,6 +970,7 @@ public class TPMovement_Controller : MonoBehaviour
             elapsedRollDuration = 0f;
             movementState = MovementState.Roll;
             anim.SetBool("is_RollForward", true);
+            Chochosan.UI_Chochosan_Spells.Instance.DisplayCooldown("Roll", playerStats.rollCooldown);
         }
     }
 
@@ -977,6 +982,7 @@ public class TPMovement_Controller : MonoBehaviour
             elapsedRollDuration = 0f;
             movementState = MovementState.Roll;
             anim.SetBool("is_RollBackward", true);
+            Chochosan.UI_Chochosan_Spells.Instance.DisplayCooldown("Roll", playerStats.rollCooldown);
         }
     }
 

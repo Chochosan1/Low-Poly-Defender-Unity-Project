@@ -46,7 +46,6 @@ namespace Chochosan
         [SerializeField]
         private List<TMPro.TextMeshProUGUI> bowTexts; //buttonText; stateText; tooltipText;
 
-
         private void Start()
         {
             UpdateStatsValues();
@@ -117,7 +116,6 @@ namespace Chochosan
                     break;
             }
         }
-
 
         //TPMovement_Controller calls this
         public void SetInitialBarValues(string resourceName)

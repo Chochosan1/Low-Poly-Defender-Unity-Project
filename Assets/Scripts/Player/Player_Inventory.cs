@@ -38,6 +38,8 @@ public class Player_Inventory : MonoBehaviour
     public GameObject boots;
     public GameObject bootsLight;
 
+    private bool isCoroutineRunning = false;
+
     private void Start()
     {
         rewardPanelText = rewardAlertPanel.GetComponentInChildren<TextMeshProUGUI>();
@@ -129,6 +131,12 @@ public class Player_Inventory : MonoBehaviour
         Chochosan.UI_Chochosan.Instance.UI_UpdateTextsOnMagicUnlocked("Bow fire arrow");
     }
 
+    public void UnlockAllCheat()
+    {
+        UnlockBow();
+        UnlockLightBoots();
+    }
+
     public bool IsBowUnlocked()
     {
         return isBowUnlocked;
@@ -154,11 +162,16 @@ public class Player_Inventory : MonoBehaviour
 
     private IEnumerator DisableGameObjectAfter(GameObject objectToDisable, float disableAfterSeconds, bool clearTextAtTheEnd)
     {
-        yield return new WaitForSeconds(disableAfterSeconds);
-        if (clearTextAtTheEnd)
+        if (!isCoroutineRunning)
         {
-            objectToDisable.GetComponentInChildren<TextMeshProUGUI>().text = ""; //clear the string at the end
+            isCoroutineRunning = true;
+            yield return new WaitForSeconds(disableAfterSeconds);
+            if (clearTextAtTheEnd)
+            {
+                objectToDisable.GetComponentInChildren<TextMeshProUGUI>().text = ""; //clear the string at the end
+            }
+            objectToDisable.SetActive(false);
+            isCoroutineRunning = false;
         }
-        objectToDisable.SetActive(false);
     }
 }
