@@ -25,8 +25,12 @@ namespace Chochosan
         {
             rollAnim = rollCooldownImage.GetComponentInParent<Animator>();
             attack3Anim = attack3CooldownImage.GetComponentInParent<Animator>();
-            attack1Anim = attack1Image.GetComponentInParent<Animator>();
-            attack2Anim = attack2Image.GetComponentInParent<Animator>();
+            attack1Anim = attack1Image.GetComponent<Animator>();
+            attack2Anim = attack2Image.GetComponent<Animator>();
+            attack3Holder = attack3CooldownImage.GetComponentInParent<Image>();
+
+            bow_attack1Anim = bow_attack1Image.GetComponent<Animator>();
+            bow_attack2Anim = bow_attack2Image.GetComponent<Animator>();
         }
 
         //ROLL
@@ -41,21 +45,32 @@ namespace Chochosan
         //Attack3
         [SerializeField]
         private Image attack3CooldownImage;
+        private Image attack3Holder;
         [SerializeField]
         private TextMeshProUGUI attack3CooldownText;
         private bool attack3CoolingDown = false;
         private float attack3CooldownTimer, attack3Cooldown;
         private Animator attack3Anim;
 
-        //Attack1
+        //Attack1 Melee
         [SerializeField]
         private Image attack1Image;
         private Animator attack1Anim;
 
-        //Attack2
+        //Attack2 Melee
         [SerializeField]
         private Image attack2Image;
         private Animator attack2Anim;
+
+        //Attack1 Bow
+        [SerializeField]
+        private Image bow_attack1Image;
+        private Animator bow_attack1Anim;
+
+        //Attack2 Bow
+        [SerializeField]
+        private Image bow_attack2Image;
+        private Animator bow_attack2Anim;
 
         // Update is called once per frame
         void Update()
@@ -91,6 +106,28 @@ namespace Chochosan
             }
         }
 
+        public void SwapUIBetweenMeleeAndBow(bool isSwitchedToBow)
+        {
+            if(!isSwitchedToBow)
+            {
+                attack1Image.gameObject.SetActive(true);
+                attack2Image.gameObject.SetActive(true);
+                attack3Holder.gameObject.SetActive(true);
+
+                bow_attack1Image.gameObject.SetActive(false);
+                bow_attack2Image.gameObject.SetActive(false);
+            }
+            else
+            {
+                bow_attack1Image.gameObject.SetActive(true);
+                bow_attack2Image.gameObject.SetActive(true);
+
+                attack1Image.gameObject.SetActive(false);
+                attack2Image.gameObject.SetActive(false);
+                attack3Holder.gameObject.SetActive(false);
+            }
+        }
+
         public void DisplayCooldown(string spellName, float cooldown)
         {
             switch (spellName)
@@ -117,10 +154,24 @@ namespace Chochosan
             switch (spellName)
             {
                 case "Attack1":
-                    attack1Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    if (attack1Image.gameObject.activeSelf)
+                    {
+                        attack1Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    }
+                    else if (bow_attack1Image.gameObject.activeSelf)
+                    {
+                        bow_attack1Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    }                 
                     break;
                 case "Attack2":
-                    attack2Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    if (attack2Image.gameObject.activeSelf)
+                    {
+                        attack2Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    }
+                    else if (bow_attack2Image.gameObject.activeSelf)
+                    {
+                        bow_attack2Anim.SetBool("TriggerFeedback_AbilityUsed", true);
+                    }
                     break;
             }
             

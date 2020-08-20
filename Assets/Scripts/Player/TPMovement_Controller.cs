@@ -629,7 +629,7 @@ public class TPMovement_Controller : MonoBehaviour
         Collider[] hitColliders = Physics.OverlapSphere(transform.position + new Vector3(0f, attackYoffset, 0f), attack3Radius, enemyLayer);
         //  UpdateRageAndRageBar(-playerStats.currentRage * 0.5f);
         //   UpdateRageAndRageBar(-playerStats.attack3RageRequirement);
-        Chochosan.UI_Chochosan_Spells.Instance.DisplayCooldown("Attack3", playerStats.attack3Cooldown);
+        
         foreach (Collider hit in hitColliders)
         {
             if(hit.CompareTag("AI"))
@@ -697,6 +697,8 @@ public class TPMovement_Controller : MonoBehaviour
         weapon1visual.SetActive(!is_SwitchedToBow);
         weapon2visual.SetActive(!is_SwitchedToBow);
         bowVisual.SetActive(is_SwitchedToBow);
+
+        Chochosan.UI_Chochosan_Spells.Instance.SwapUIBetweenMeleeAndBow(is_SwitchedToBow);
     }
 
     //called on roll animation event
@@ -961,6 +963,7 @@ public class TPMovement_Controller : MonoBehaviour
     {
         if (movementState != MovementState.Attack && movementState != MovementState.SwitchingEquipment && internalAttack3Timestamp <= Time.time && attack3CooldownTimestamp <= Time.time && !is_SwitchedToBow /*&& CheckIfEnoughRageForSpell(playerStats.attack3RageRequirement, true)*/)
         {
+            Chochosan.UI_Chochosan_Spells.Instance.DisplayCooldown("Attack3", playerStats.attack3Cooldown);
             ResetAllElapsedAttackDurations();
             internalAttack3Timestamp = internalAttack3Cooldown + Time.time;
             attack3CooldownTimestamp = playerStats.attack3Cooldown + Time.time;
