@@ -87,11 +87,11 @@ public class Player_Inventory : MonoBehaviour
         rewardAlertPanel.SetActive(true);
         if(varValue > 0)
         {
-            rewardPanelText.text += "\n " + varName + " " + varValue; //add multiple rewards to the same string in case the player receives multiple rewards at once
+            rewardPanelText.text += varName + " " + varValue + "\n "; //add multiple rewards to the same string in case the player receives multiple rewards at once
         }
         else
         {
-            rewardPanelText.text += "\n " + varName + " "; //add multiple rewards to the same string in case the player receives multiple rewards at once
+            rewardPanelText.text += varName + "\n "; //add multiple rewards to the same string in case the player receives multiple rewards at once
         }
        
         StartCoroutine(DisableGameObjectAfter(rewardAlertPanel, 3, true));

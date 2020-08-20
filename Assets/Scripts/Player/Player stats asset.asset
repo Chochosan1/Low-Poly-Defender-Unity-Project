@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: Player stats asset
   m_EditorClassIdentifier: 
   maxHealth: 1750
-  currentHealth: 950
+  currentHealth: 1750
   maxRage: 180
-  currentRage: 150
+  currentRage: 180
   autoAttackDamage: 2000
   attackRange: 5
   autoKnockbackPower: 10
   attack1RageCharge: 25
   attack2RageRequirement: 50
   attack3Cooldown: 8
-  maxAngle: 120
+  maxAngle: 130
   walkSpeed: 2350
   sprintSpeed: 3350
   rotationSpeed: 180

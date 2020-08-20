@@ -19,15 +19,26 @@ public class Follow_Target : MonoBehaviour
     [SerializeField]
     private float moveSpeed;
 
+    [SerializeField]
+    private bool is_FollowEnabled = false;
+
     void Update()
     {
-        if (lerpMovement)
+        if(is_FollowEnabled)
         {
-            transform.position = Vector3.Lerp(transform.position, targetToFollow.position, moveSpeed * Time.deltaTime);
-        }
-        else
-        {
-            transform.position = targetToFollow.position + targetOffset;
-        }
+            if (lerpMovement)
+            {
+                transform.position = Vector3.Lerp(transform.position, targetToFollow.position, moveSpeed * Time.deltaTime);
+            }
+            else
+            {
+                transform.position = targetToFollow.position + targetOffset;
+            }
+        }  
+    }
+
+    public void EnableFollow()
+    {
+        is_FollowEnabled = true;
     }
 }

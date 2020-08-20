@@ -4,7 +4,7 @@ using UnityEngine;
 /// <summary>
 /// Wand controller, finds a target and shoots a projectile towards it. Projectile controller is a separate script. Projectile stats are a ScriptableObject.
 /// </summary>
-public class MagicWandMinion : MonoBehaviour
+public class MagicWandMinion : MonoBehaviour, IInteractable
 {
     public static MagicWandMinion Instance;
 
@@ -30,6 +30,9 @@ public class MagicWandMinion : MonoBehaviour
     private float castTimestamp;
 
     [SerializeField]
+    private bool wandLooted = false;
+
+    [SerializeField]
     private float force = 3f;
     private GameObject currentTarget;
     private EnemyAI_Controller currentTargetAI;
@@ -41,7 +44,7 @@ public class MagicWandMinion : MonoBehaviour
 
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
         }
@@ -50,30 +53,35 @@ public class MagicWandMinion : MonoBehaviour
 
     private void Update()
     {
-        ChooseNewTarget();
-        if (Time.time >= castTimestamp && currentTarget != null)
+        if (wandLooted)
         {
-            SetTargetToNullIfTargetIsDead();       
-            castTimestamp = Time.time + castCooldown;
-            CastSpell();
+            ChooseNewTarget();
+            if (Time.time >= castTimestamp && currentTarget != null)
+            {
+                SetTargetToNullIfTargetIsDead();
+                castTimestamp = Time.time + castCooldown;
+                CastSpell();
+            }
         }
     }
 
 
 
+
+
     private void CastSpell()
     {
-        if(currentTarget != null && TPMovement_Controller.instance.CheckIfEnoughRageForSpell(ragePerShotCost, false))
+        if (currentTarget != null && TPMovement_Controller.instance.CheckIfEnoughRageForSpell(ragePerShotCost, false))
         {
             TPMovement_Controller.instance.UpdateRageAndRageBar(-ragePerShotCost);
-            if(stillSpawning) //if the pool is still not full
+            if (stillSpawning) //if the pool is still not full
             {
                 GameObject projectileCopy = Instantiate(projectilePrefab, transform.position + offsetVector, projectilePrefab.transform.rotation);
                 projectileCopy.GetComponent<Rigidbody>().AddForce((currentTarget.transform.position - transform.position) * force, ForceMode.Impulse);
             }
             else //when full start using items from the pool
             {
-               // Debug.Log("I COME FROM THE POOL");
+                // Debug.Log("I COME FROM THE POOL");
                 Rigidbody tempRb = fireballPool[currentPoolItem].GetComponent<Rigidbody>();
                 tempRb.velocity = new Vector3(0, 0, 0);
                 fireballPool[currentPoolItem].transform.position = transform.position + offsetVector;
@@ -81,17 +89,17 @@ public class MagicWandMinion : MonoBehaviour
                 tempRb.AddForce((currentTarget.transform.position - transform.position) * force, ForceMode.Impulse);
                 currentPoolItem++;
 
-                if(currentPoolItem >= fireballPool.Count)
+                if (currentPoolItem >= fireballPool.Count)
                 {
                     currentPoolItem = 0;
-                 //   Debug.Log("MAX OBJECT REACHED, STARTING FROM THE START");
+                    //   Debug.Log("MAX OBJECT REACHED, STARTING FROM THE START");
                 }
-            }                
-        }   
+            }
+        }
     }
 
     private void ChooseNewTarget()
-    {  
+    {
         if (currentTarget == null)
         {
             Collider[] hitColliders = Physics.OverlapSphere(transform.position, enemyDetectionArea, enemyLayer);
@@ -123,10 +131,26 @@ public class MagicWandMinion : MonoBehaviour
     {
         fireballPool.Add(fireball);
 
-        if(fireballPool.Count >= projectilePoolSize)
+        if (fireballPool.Count >= projectilePoolSize)
         {
             stillSpawning = false;
-         //   Debug.Log("DISABLING INSTANTIATION!");
+            //   Debug.Log("DISABLING INSTANTIATION!");
         }
+    }
+
+    public void LootWand()
+    {
+        wandLooted = true;
+        this.GetComponentInParent<Follow_Target>().EnableFollow();
+        this.gameObject.tag = "Untagged";
+        this.gameObject.layer = 0;
+
+        Player_Inventory.instance.UpdateRewardPanelText("Wand companion acquired", 0);
+    }
+
+    public void Interact()
+    {
+        LootWand();
+       
     }
 }

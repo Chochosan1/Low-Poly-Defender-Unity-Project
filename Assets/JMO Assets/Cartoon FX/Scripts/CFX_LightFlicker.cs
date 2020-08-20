@@ -29,7 +29,7 @@ public class CFX_LightFlicker : MonoBehaviour
 		baseIntensity = currentLight.intensity;
 	}
 	
-	void OnEnable()
+	void Start()
 	{
 		minIntensity = baseIntensity;
 		maxIntensity = minIntensity + addIntensity;
