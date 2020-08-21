@@ -34,6 +34,7 @@ public class TPMovement_Controller : MonoBehaviour
     public Animator rageBarAnim;
     public GameObject questPanel;
     public GameObject inventoryPanel;
+    public GameObject mainMenuPanel;
     public GameObject interactableAlertText;
     public GameObject hitObjectParticle;
     [Header("Cursor options")]
@@ -160,6 +161,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.performed += HandleInteract;
         controls.MainControls.ToggleQuestPanel.performed += HandleToggleQuestPanel;
         controls.MainControls.ToggleInventoryPanel.performed += HandleToggleInventory;
+        controls.MainControls.ToggleMainMenu.performed += HandleToggleMainMenu;
         controls.MainControls.Movement.Enable();
         controls.MainControls.SprintToggle.Enable();
         controls.MainControls.LockedOrbit.Enable();
@@ -175,8 +177,9 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.Enable();
         controls.MainControls.ToggleQuestPanel.Enable();
         controls.MainControls.ToggleInventoryPanel.Enable();
+        controls.MainControls.ToggleMainMenu.Enable();
 
-      //  OnHeroTakeDamage += Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues;
+        //  OnHeroTakeDamage += Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues;
     }
 
     private void OnDisable()
@@ -200,6 +203,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.performed -= HandleInteract;
         controls.MainControls.ToggleQuestPanel.performed -= HandleToggleQuestPanel;
         controls.MainControls.ToggleInventoryPanel.performed -= HandleToggleInventory;
+        controls.MainControls.ToggleMainMenu.performed -= HandleToggleMainMenu;
         controls.MainControls.Movement.Disable();
         controls.MainControls.SprintToggle.Disable();
         controls.MainControls.LockedOrbit.Disable();
@@ -215,6 +219,7 @@ public class TPMovement_Controller : MonoBehaviour
         controls.MainControls.Interact.Disable();
         controls.MainControls.ToggleQuestPanel.Disable();
         controls.MainControls.ToggleInventoryPanel.Disable();
+        controls.MainControls.ToggleMainMenu.Disable();
 
 
      //   OnHeroTakeDamage -= Chochosan.UI_Chochosan.Instance.UpdateBarAndTextValues;
@@ -836,7 +841,12 @@ public class TPMovement_Controller : MonoBehaviour
         }      
         return false;
     }
-   
+
+   //exit button
+    public void ExitApplication()
+    {
+        Application.Quit();
+    }
 
     #region HandleEvents
     private void HandleMove(InputAction.CallbackContext context)
@@ -888,6 +898,21 @@ public class TPMovement_Controller : MonoBehaviour
     {
         questPanel.SetActive(!questPanel.activeSelf);
         if (questPanel.activeSelf)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
+    }
+
+    private void HandleToggleMainMenu(InputAction.CallbackContext context)
+    {
+        mainMenuPanel.SetActive(!mainMenuPanel.activeSelf);
+        if (mainMenuPanel.activeSelf)
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;

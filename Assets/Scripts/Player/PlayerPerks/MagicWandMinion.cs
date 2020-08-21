@@ -147,6 +147,5 @@ public class MagicWandMinion : MonoBehaviour, IInteractable
     public void Interact()
     {
         LootWand();
-       
     }
 }
