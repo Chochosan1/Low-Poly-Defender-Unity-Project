@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9db536fe1bed5f41b78e72c9b20c6d0, type: 3}
+  m_Name: Sound Asset
+  m_EditorClassIdentifier: 
+  playerMoveFootsteps: {fileID: 0}
+  playerSwordHit: {fileID: 8300000, guid: 9d085fb52ba414e2ab11bc7103ca7b58, type: 3}
+  playerBowHit: {fileID: 8300000, guid: f7f7023b786424f8388721419629c29e, type: 3}
+  playerBowAttack1: {fileID: 8300000, guid: bdd52521d3ff14fc38f458063f354d7a, type: 3}
+  playerBowAttack2: {fileID: 8300000, guid: e7f87e8639f474d96a39ccf5902e58f9, type: 3}
+  swordDraw: {fileID: 8300000, guid: c8742e7b80db74a22a276ec4679cdc76, type: 3}
+  bowDraw: {fileID: 8300000, guid: 1315c3351385140ecb50956d47f00c07, type: 3}
+  enemyDeath: {fileID: 8300000, guid: 2db3ed5e94d584f4899d41a0f5bc1160, type: 3}

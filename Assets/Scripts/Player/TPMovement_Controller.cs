@@ -92,6 +92,7 @@ public class TPMovement_Controller : MonoBehaviour
     private ControlsGame controls;
     private MovementState movementState;
     private Animator anim;
+    private AudioSource audioSource;
 
     private Vector2 moveAxis;
     private Vector2 mouseMoveAxis;
@@ -104,10 +105,6 @@ public class TPMovement_Controller : MonoBehaviour
     InputAction.CallbackContext fakeContext; //entirely in order to pass it as a parameter to the Handle methods; serves no other purpose
 
     private readonly RaycastHit[] _groundCastResults = new RaycastHit[8]; //raycasts for checking if grounded
-
-    //Events
-    public delegate void OnHeroTakeDamageDelegate(string resourceToUpdate);
-    public event OnHeroTakeDamageDelegate OnHeroTakeDamage;
       
     #region InitialSetup
     void Awake()
@@ -125,6 +122,7 @@ public class TPMovement_Controller : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         playerCollider = GetComponent<CapsuleCollider>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
         playerStats.currentHealth = playerStats.maxHealth;
         playerStats.currentRage = playerStats.maxRage;
@@ -594,10 +592,12 @@ public class TPMovement_Controller : MonoBehaviour
         {
             if (hit.transform.CompareTag("Knockable"))
             {
+                Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
                 hit.transform.GetComponent<IKnockback>().SufferAttackWithKnockback(this.gameObject);
             }
             else if (hit.transform.CompareTag("AI"))
             {
+             //   Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
                 hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(0.65f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0, this.gameObject);
                 //  UpdateRageAndRageBar(GetAutoAttackDamage(0.65f, Vector3.zero, false));
                 UpdateRageAndRageBar(playerStats.attack1RageCharge);
@@ -613,10 +613,12 @@ public class TPMovement_Controller : MonoBehaviour
         {
             if (hit.transform.CompareTag("Knockable"))
             {
+                Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
                 hit.transform.GetComponent<IKnockback>().SufferAttackWithKnockback(this.gameObject);
             }
             else if (hit.transform.CompareTag("AI"))
             {
+            //    Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
                 hit.transform.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), playerStats.autoKnockbackPower, this.gameObject);
                 //   UpdateRageAndRageBar(GetAutoAttackDamage(1.1f, Vector3.zero, false));
                 
@@ -634,6 +636,7 @@ public class TPMovement_Controller : MonoBehaviour
         {
             if(hit.CompareTag("AI"))
             {
+              //  Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
                 hit.GetComponent<EnemyAI_Controller>().TakeDamage(GetAutoAttackDamage(1.1f, hit.transform.position + new Vector3(0f, 0.65f, 0f), true), 0f, this.gameObject);             
             }
         }
@@ -667,6 +670,7 @@ public class TPMovement_Controller : MonoBehaviour
     public void ShootArrow1()
     {
         GameObject arrow = Instantiate(arrowToShootPrefab, arrowSpawnPoint.transform);
+        Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowAttack1, audioSource);
     }
 
     public void ShootArrow2()
@@ -675,6 +679,7 @@ public class TPMovement_Controller : MonoBehaviour
 
         //spawn arrow just a bit in front of the hero to avoid self-collision
         arrow.transform.position = arrowSpawnPoint.transform.position + arrowSpawnPoint.transform.forward;
+     //   Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowAttack2, audioSource);
     }
 
     public void TakeDamage(float damage, GameObject attacker)
@@ -683,6 +688,14 @@ public class TPMovement_Controller : MonoBehaviour
         //   OnHeroTakeDamage?.Invoke("Health");
         //if (OnHeroTakeDamage != null)
         //    OnHeroTakeDamage("Health");//invoke the delegate
+        if(attacker.name.Contains("Arrow"))
+        {
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowHit, audioSource);
+        }
+        else if(attacker.name.Contains("DoubleSword"))
+        {
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
+        }
         UpdateHealthBar();
         if (playerStats.currentHealth <= 0)
         {
@@ -699,6 +712,11 @@ public class TPMovement_Controller : MonoBehaviour
         bowVisual.SetActive(is_SwitchedToBow);
 
         Chochosan.UI_Chochosan_Spells.Instance.SwapUIBetweenMeleeAndBow(is_SwitchedToBow);
+
+        if (is_SwitchedToBow)
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowDraw, audioSource);
+        else
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordDraw, audioSource);
     }
 
     //called on roll animation event
@@ -952,6 +970,7 @@ public class TPMovement_Controller : MonoBehaviour
             movementState = MovementState.Attack;
             anim.SetBool("is_BowAttack2", true);
             arrowVisual.SetActive(is_SwitchedToBow);
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowAttack2, audioSource);
         }
         else if (movementState == MovementState.Attack && queuedAttackNum != 2 /*&& elapsedAttackDuration >= attack2MaxDuration*/) //queue the attack if already attacking
         {

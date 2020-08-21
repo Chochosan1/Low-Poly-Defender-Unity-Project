@@ -21,10 +21,21 @@ public class Arrow_Controller : MonoBehaviour
     [Tooltip("How far aside should each split arrow spawn based on the position of the original arrow.")]
     public float splitArrowOffset = 1f;
     private Rigidbody rb;
+    private AudioSource audioSource;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.minDistance = Chochosan.Sound_Manager.Instance.minDistanceCustomRolloff;
+        audioSource.maxDistance = Chochosan.Sound_Manager.Instance.maxDistanceCustomRolloff;
+        var animationCurve = new AnimationCurve( //non-linear rolloff but it actually does not produce sound after the max distance (unlike the logarithmic rolloff)
+                    new Keyframe(audioSource.minDistance, 1f),
+                    new Keyframe(audioSource.minDistance + (audioSource.maxDistance - audioSource.minDistance) / 4f, .35f),
+                    new Keyframe(audioSource.maxDistance, 0f));
+        audioSource.rolloffMode = AudioRolloffMode.Custom;
+        animationCurve.SmoothTangents(1, .025f);
+        audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, animationCurve);
         if (gameObject.name.Contains("SplitArrow")) //don't allow splitting if it's not an original arrow
         {
             splitArrowPerkActivated = false;
@@ -65,8 +76,9 @@ public class Arrow_Controller : MonoBehaviour
         splitArrowPerkActivated = false;
         if(collision.transform.CompareTag("AI"))
         {
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowHit, audioSource);
             collision.gameObject.GetComponent<EnemyAI_Controller>().TakeDamage(damage, 0, this.gameObject);
-            HitTarget(0f, true);
+            HitTarget(0.25f, true);
             if(ragePerShot > 0)
             {
                 TPMovement_Controller.instance.UpdateRageAndRageBar(ragePerShot);
@@ -75,8 +87,9 @@ public class Arrow_Controller : MonoBehaviour
         }
         else if(collision.transform.CompareTag("Player"))
         {
+            Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowHit, audioSource);
             collision.gameObject.GetComponent<TPMovement_Controller>().TakeDamage(damage, this.gameObject);
-            HitTarget(0f, true);
+            HitTarget(0.25f, true);
             return;
         }
         HitTarget(5f, false);

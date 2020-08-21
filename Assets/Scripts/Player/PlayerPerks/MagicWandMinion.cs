@@ -65,10 +65,6 @@ public class MagicWandMinion : MonoBehaviour, IInteractable
         }
     }
 
-
-
-
-
     private void CastSpell()
     {
         if (currentTarget != null && TPMovement_Controller.instance.CheckIfEnoughRageForSpell(ragePerShotCost, false))

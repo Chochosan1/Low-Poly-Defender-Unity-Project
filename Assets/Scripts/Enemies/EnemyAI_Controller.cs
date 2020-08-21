@@ -48,6 +48,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     private GameObject currentTarget;
     private EnemyAI_Controller currentTargetAI;
     private NavMeshAgent agent;
+    private AudioSource audioSource;
     [HideInInspector]
     public AIState aiState;
     private Vector3 direction;
@@ -58,6 +59,16 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     {
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.minDistance = Chochosan.Sound_Manager.Instance.minDistanceCustomRolloff;
+        audioSource.maxDistance = Chochosan.Sound_Manager.Instance.maxDistanceCustomRolloff;
+        var animationCurve = new AnimationCurve( //non-linear rolloff but it actually does not produce sound after the max distance (unlike the logarithmic rolloff)
+                    new Keyframe(audioSource.minDistance, 1f),
+                    new Keyframe(audioSource.minDistance + (audioSource.maxDistance - audioSource.minDistance) / 4f, .35f),
+                    new Keyframe(audioSource.maxDistance, 0f));
+        audioSource.rolloffMode = AudioRolloffMode.Custom;
+        animationCurve.SmoothTangents(1, .025f);
+        audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff, animationCurve);
         //  rb = GetComponent<Rigidbody>();
         SetAttackCooldowns();
         currentHealth = maxHealth;
@@ -269,6 +280,15 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
     {
         if (!is_Dead)
         {
+            if (attacker.CompareTag("Player") || attacker.name.Contains("DoubleSword"))
+            {
+                Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerSwordHit, audioSource);
+            }
+            else if (attacker.name.Contains("Arrow"))
+            {
+                Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.PlayerBowHit, audioSource);
+            }
+
             if (currentTarget == null && checkAreaIfDamageTakenFromAfar)
             {
                 aiState = AIState.LookingForTarget;
@@ -289,7 +309,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
                 {
                     attacker.GetComponent<QuestComponent>().CheckQuestProgressKill(this);
                 }
-                else if(attacker.name.Contains("Fireball"))
+                else if (attacker.name.Contains("Fireball"))
                 {
                     Screen_Shake.Instance.ShakeScreen(0.25f, 5);
                 }
@@ -322,12 +342,13 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         currentTarget = null;
         currentTargetAI = null;
         agent.SetDestination(transform.position);
+        Chochosan.Sound_Manager.Instance.PlaySound(Chochosan.Sound_Manager.Sounds.EnemyDeath, audioSource);
     }
 
     //rotate target especially archers to look at the target so that they can shoot it even if on different ground level
     private void LookAtTarget()
     {
-        if(currentTarget != null)
+        if (currentTarget != null)
         {
             if (is_Bowman)
             {
@@ -343,7 +364,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
                 targetRotation.z = transform.rotation.z;
                 transform.rotation = targetRotation;
             }
-        }  
+        }
     }
 
     public void Attack1()
@@ -440,7 +461,7 @@ public class EnemyAI_Controller : Enemy_Base, IEnemyAI
         }
 
         if (currentTarget != null)
-        {          
+        {
             LookAtTarget();
         }
     }
